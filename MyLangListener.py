@@ -80,6 +80,15 @@ class MyLangListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MyLangParser#forRangeStatement.
+    def enterForRangeStatement(self, ctx:MyLangParser.ForRangeStatementContext):
+        pass
+
+    # Exit a parse tree produced by MyLangParser#forRangeStatement.
+    def exitForRangeStatement(self, ctx:MyLangParser.ForRangeStatementContext):
+        pass
+
+
     # Enter a parse tree produced by MyLangParser#comment.
     def enterComment(self, ctx:MyLangParser.CommentContext):
         pass

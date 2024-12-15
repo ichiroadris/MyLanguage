@@ -165,3 +165,24 @@ class Evaluator(MyLangListener):
         # Remove the loop variable after the loop ends
         if loop_var in self.environment:
             del self.environment[loop_var]
+
+    def enterForRangeStatement(self, ctx):
+        # Extract the loop variable name
+        loop_var = ctx.ID().getText()
+
+        # Evaluate the start and end values (from and to)
+        start = int(ctx.INT(0).getText())
+        end = int(ctx.INT(1).getText())
+
+        # Iterate over the range
+        for value in range(start, end + 1):  # Assuming inclusive range
+            # Assign the loop variable in the environment
+            self.environment[loop_var] = value
+
+            # Execute the loop body
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+
+        # Remove the loop variable from the environment after the loop ends
+        if loop_var in self.environment:
+            del self.environment[loop_var]

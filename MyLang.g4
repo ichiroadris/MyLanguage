@@ -7,6 +7,7 @@ statement    : variableDeclaration
               | whileStatement
               | ifElseStatement
               | forEachStatement
+              | forRangeStatement
               | PASS;
 variableDeclaration : LET ID '=' expression;
 printStatement      : PRINT expression;
@@ -22,8 +23,9 @@ switchStatement
         ( DEFAULT (statement)+ )? 
       '}' END_SWITCH;
 forEachStatement
-    : 'for' '(' ID 'in' iterable ')' '{' statement* '}'
-    ;
+    : 'for' '(' ID 'in' iterable ')' '{' statement* '}';
+forRangeStatement
+    : 'for' '(' ID 'from' INT 'to' INT ')' '{' statement* '}';
 
 
 comment : '//' STRING* ;
