@@ -1,4 +1,4 @@
-# Generated from ../../MyLang/MyLang.g4 by ANTLR 4.13.2
+# Generated from MyLang.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .MyLangParser import MyLangParser
@@ -68,6 +68,15 @@ class MyLangListener(ParseTreeListener):
 
     # Exit a parse tree produced by MyLangParser#switchStatement.
     def exitSwitchStatement(self, ctx:MyLangParser.SwitchStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by MyLangParser#forEachStatement.
+    def enterForEachStatement(self, ctx:MyLangParser.ForEachStatementContext):
+        pass
+
+    # Exit a parse tree produced by MyLangParser#forEachStatement.
+    def exitForEachStatement(self, ctx:MyLangParser.ForEachStatementContext):
         pass
 
 
