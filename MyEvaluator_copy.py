@@ -95,31 +95,28 @@ class Evaluator(MyLangListener):
                 return left % right
         return 0
 
-    def evaluate_condition2(self, condition_ctx):
-      # If the condition is a comparison expression
-      if len(condition_ctx) == 3 and isinstance(condition_ctx[1], antlr4.tree.Tree.TerminalNodeImpl):
-          left = self.evaluate_expression(condition_ctx[0])
-          right = self.evaluate_expression(condition_ctx[2])
-          comp_op = condition_ctx[1].getText()  # The comparison operator
-          
-          if comp_op == ">":
-              return left > right
-          elif comp_op == "<":
-              return left < right
-          elif comp_op == "==":
-              return left == right
-          elif comp_op == "!=":
-              return left != right
-          elif comp_op == ">=":
-              return left >= right
-          elif comp_op == "<=":
-              return left <= right
-      
-      # If the condition is a boolean value (true or false)
-      elif len(condition_ctx) == 1 and isinstance(condition_ctx[0], antlr4.tree.Tree.TerminalNodeImpl):
-          return condition_ctx[0].getText() == "true"
-      
-      return False
+    def evaluate_condition(self, condition_ctx):
+        if condition_ctx.expression():
+            left = self.evaluate_expression(condition_ctx.expression(0))
+            right = self.evaluate_expression(condition_ctx.expression(1))
+            op = condition_ctx.COMPARISON_OP().getText()
+            
+            if op == ">":
+                return left > right
+            elif op == "<":
+                return left < right
+            elif op == "==":
+                return left == right
+            elif op == "!=":
+                return left != right
+            elif op == ">=":
+                return left >= right
+            elif op == "<=":
+                return left <= right
+        elif condition_ctx.BOOLEAN():
+            return condition_ctx.BOOLEAN().getText() == 'true'
+        
+        return False
 
     def evaluate_condition(self, condition_ctx):
       # print(f"Evaluating condition: {condition_ctx}")
@@ -152,3 +149,40 @@ class Evaluator(MyLangListener):
             print("Executing default case.")
             for stmt in ctx.DEFAULT().statement():
                 self.process_statement(stmt)
+    
+    def enterForEachStatement(self, ctx):
+        loop_var = ctx.ID().getText()
+        iterable = self.evaluate_expression(ctx.iterable())
+        
+        for item in iterable:
+            # Create a new scope for the loop variable
+            self.environment[loop_var] = item
+            
+            # Execute the loop body
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+            
+        # Remove the loop variable after the loop ends
+        if loop_var in self.environment:
+            del self.environment[loop_var]
+
+    def enterForRangeStatement(self, ctx):
+        # Extract the loop variable name
+        loop_var = ctx.ID().getText()
+
+        # Evaluate the start and end values (from and to)
+        start = int(ctx.INT(0).getText())
+        end = int(ctx.INT(1).getText())
+
+        # Iterate over the range
+        for value in range(start, end + 1):  # Assuming inclusive range
+            # Assign the loop variable in the environment
+            self.environment[loop_var] = value
+
+            # Execute the loop body
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+
+        # Remove the loop variable from the environment after the loop ends
+        if loop_var in self.environment:
+            del self.environment[loop_var]

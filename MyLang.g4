@@ -6,6 +6,8 @@ statement    : variableDeclaration
               | printStatement
               | whileStatement
               | ifElseStatement
+              | forEachStatement
+              | forRangeStatement
               | PASS;
 variableDeclaration : LET ID '=' expression;
 printStatement      : PRINT expression;
@@ -20,13 +22,18 @@ switchStatement
         ( CASE LITERAL (statement)+ )* 
         ( DEFAULT (statement)+ )? 
       '}' END_SWITCH;
+forEachStatement
+    : 'for' '(' ID 'in' iterable ')' '{' statement* '}';
+forRangeStatement
+    : 'for' '(' ID 'from' INT 'to' INT ')' '{' statement* '}';
 
 
 comment : '//' STRING* ;
 multilineComment : '///' STRING* '///';
 iterable            : array
-                    | object
-                    | ID ;
+                    | object 
+                    | ID
+                    | INT ;
 array               : '[' expression (',' expression)* ']' ;
 object : '{' (pair (',' pair)*)? '}' ;
 pair  : STRING ':' expression ;
@@ -35,6 +42,7 @@ condition           : expression COMPARISON_OP expression
 expression          : INT
                     | ID
                     | STRING
+                    | BOOLEAN
                     | array
                     | object
                     | '(' expression OPERATOR expression ')'
@@ -69,9 +77,9 @@ BOOLEAN             : 'true' | 'false' ;
 INT       : DIGIT+ ;
 STRING : '"' ( ~['\\] | '\\' . )* '"' ;
 
-LETTER    : 'a' .. 'z' | 'A' .. 'Z' | '_';  
-DIGIT     : '0' .. '9'; 
-ID        : LETTER (LETTER | DIGIT)* ;  
+fragment LETTER    : 'a' .. 'z' | 'A' .. 'Z' | '_';  
+fragment DIGIT     : '0' .. '9'; 
+ID        : LETTER (LETTER | DIGIT)* ;
 LITERAL : INT
         | STRING
         | BOOLEAN ;
