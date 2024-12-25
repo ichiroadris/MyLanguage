@@ -1,7 +1,7 @@
 from antlr4 import *
 from MyLangLexer import MyLangLexer
 from MyLangParser import MyLangParser
-from MyEvaluator_copy import Evaluator
+from MyEvaluator import Evaluator
 
 # Input from the user
 expression = """
