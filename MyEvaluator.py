@@ -23,8 +23,7 @@ class Evaluator(MyLangListener):
           print(f"Executing while block...")
           for stmt in ctx.statement():
               # self.process_statement(stmt)
-              while(True):
-                  print(5)
+              print(stmt.getText())
 
 
     # Entering an ifElseStatement
@@ -77,8 +76,6 @@ class Evaluator(MyLangListener):
             return expr_ctx.BOOLEAN().getText() == 'true'
         elif expr_ctx.array():
             return [self.evaluate_expression(e) for e in expr_ctx.array().expression()]
-        elif expr_ctx.object():
-            return {pair.STRING().getText()[1:-1]: self.evaluate_expression(pair.expression()) for pair in expr_ctx.object().pair()}
         elif expr_ctx.OPERATOR():
             left = self.evaluate_expression(expr_ctx.expression(0))
             right = self.evaluate_expression(expr_ctx.expression(1))
@@ -96,6 +93,7 @@ class Evaluator(MyLangListener):
         return 0
 
     def evaluate_condition(self, condition_ctx):
+        # print(f"++++++++Evaluating condition: {condition_ctx.ID().getText()}++++++++")
         if condition_ctx.expression():
             left = self.evaluate_expression(condition_ctx.expression(0))
             right = self.evaluate_expression(condition_ctx.expression(1))
@@ -118,15 +116,6 @@ class Evaluator(MyLangListener):
         
         return False
 
-    def evaluate_condition(self, condition_ctx):
-      # print(f"Evaluating condition: {condition_ctx}")
-      
-      if isinstance(condition_ctx, list):
-          print(f"Condition is a list with {len(condition_ctx)} elements.")
-          condition_ctx = condition_ctx[0]  # Extract the first (and only) element
-      else:
-        while(True):
-          print(5)
           
       # Inspect the children of the condition
     #   print(f"Children of the condition: {condition_ctx.children}")
