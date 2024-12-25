@@ -34,6 +34,7 @@ class Evaluator(MyLangListener):
                 self.process_statement(stmt)
         else:
             # Handle elif statements
+            print("Condition is false, checking elif blocks")
             elif_blocks = ctx.ELIF()
             for i, elif_cond in enumerate(elif_blocks):
                 if self.evaluate_condition(ctx.condition(i)):
@@ -44,7 +45,7 @@ class Evaluator(MyLangListener):
             # Handle else block if present
             if ctx.ELSE():
                 print("Executing else block")
-                for stmt in ctx.statement(len(elif_blocks)):
+                for stmt in ctx.statement():
                     self.process_statement(stmt)
 
     # Processing each statement
@@ -93,11 +94,11 @@ class Evaluator(MyLangListener):
         return 0
 
     def evaluate_condition(self, condition_ctx):
-        # print(f"++++++++Evaluating condition: {condition_ctx.ID().getText()}++++++++")
-        if condition_ctx.expression():
-            left = self.evaluate_expression(condition_ctx.expression(0))
-            right = self.evaluate_expression(condition_ctx.expression(1))
-            op = condition_ctx.COMPARISON_OP().getText()
+        print(f"++++++++Evaluating condition: {condition_ctx[0].expression(0).getText()}++++++++")
+        if condition_ctx[0].COMPARISON_OP():
+            left = self.evaluate_expression(condition_ctx[0].expression(0))
+            right = self.evaluate_expression(condition_ctx[0].expression(1))
+            op = condition_ctx[0].COMPARISON_OP().getText()
             
             if op == ">":
                 return left > right

@@ -86,7 +86,7 @@ def serializedATN():
         5,33,0,0,212,213,5,15,0,0,213,214,3,32,16,0,214,29,1,0,0,0,215,216,
         3,32,16,0,216,217,5,30,0,0,217,218,3,32,16,0,218,221,1,0,0,0,219,
         221,5,31,0,0,220,215,1,0,0,0,220,219,1,0,0,0,221,31,1,0,0,0,222,
-        223,6,16,-1,0,223,236,5,32,0,0,224,236,5,34,0,0,225,236,5,33,0,0,
+        223,6,16,-1,0,223,236,5,32,0,0,224,236,5,33,0,0,225,236,5,34,0,0,
         226,236,5,31,0,0,227,236,3,24,12,0,228,236,3,26,13,0,229,230,5,2,
         0,0,230,231,3,32,16,0,231,232,5,29,0,0,232,233,3,32,16,0,233,234,
         5,3,0,0,234,236,1,0,0,0,235,222,1,0,0,0,235,224,1,0,0,0,235,225,
@@ -1383,11 +1383,11 @@ class MyLangParser ( Parser ):
         def INT(self):
             return self.getToken(MyLangParser.INT, 0)
 
-        def ID(self):
-            return self.getToken(MyLangParser.ID, 0)
-
         def STRING(self):
             return self.getToken(MyLangParser.STRING, 0)
+
+        def ID(self):
+            return self.getToken(MyLangParser.ID, 0)
 
         def BOOLEAN(self):
             return self.getToken(MyLangParser.BOOLEAN, 0)
@@ -1439,13 +1439,13 @@ class MyLangParser ( Parser ):
                 self.state = 223
                 self.match(MyLangParser.INT)
                 pass
-            elif token in [34]:
-                self.state = 224
-                self.match(MyLangParser.ID)
-                pass
             elif token in [33]:
-                self.state = 225
+                self.state = 224
                 self.match(MyLangParser.STRING)
+                pass
+            elif token in [34]:
+                self.state = 225
+                self.match(MyLangParser.ID)
                 pass
             elif token in [31]:
                 self.state = 226

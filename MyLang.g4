@@ -40,8 +40,8 @@ pair  : STRING ':' expression ;
 condition           : expression COMPARISON_OP expression
                     | BOOLEAN ;
 expression          : INT
-                    | ID
                     | STRING
+                    | ID
                     | BOOLEAN
                     | array
                     | object

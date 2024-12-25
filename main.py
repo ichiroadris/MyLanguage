@@ -6,7 +6,13 @@ from MyEvaluator import Evaluator
 # Input from the user
 expression = """
 let a = (5+1)
-print (5+2)
+print "ahmed is a good guy"
+
+if(1 > 5) {
+  print a
+} elif(1 > 5) {
+  print 5
+}
 
 
 
