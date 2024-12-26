@@ -2,17 +2,18 @@ grammar MyLang;
 
 
 program      : statement+ ;
-statement    : variableDeclaration
+statement    : variableDeclaration 
               | printStatement
+              | whileLimitStatement
               | whileStatement
               | ifElseStatement
-              | forEachStatement
-              | forRangeStatement
+              | forStepStatement
+              | forLoopStatement
               | PASS;
 variableDeclaration : LET ID '=' expression;
 printStatement      : PRINT expression;
-
-whileStatement : WHILE '(' condition ')' '{' {statement} '}' ;
+whileLimitStatement : WHILE '(' condition LIMIT INT')' '{' statement+ '}';
+whileStatement : WHILE '(' condition ')' '{' (statement)* '}' ;
 ifElseStatement 
     : IF '(' condition ')' '{' (statement)* '}'
       ( ELIF '(' condition ')' '{' (statement)* '}' )*
@@ -22,18 +23,18 @@ switchStatement
         ( CASE LITERAL (statement)+ )* 
         ( DEFAULT (statement)+ )? 
       '}' END_SWITCH;
-forEachStatement
-    : 'for' '(' ID 'in' iterable ')' '{' statement* '}';
-forRangeStatement
-    : 'for' '(' ID 'from' INT 'to' INT ')' '{' statement* '}';
+forStepStatement
+    : FOR '(' start=INT 'to' goal=INT 'step' step=INT ')' '{' (statement)* '}'; ///Continue Later
+forLoopStatement
+    : FOR '(' INT ')' '{' (statement)* '}';
+
 
 
 comment : '//' STRING* ;
 multilineComment : '///' STRING* '///';
 iterable            : array
-                    | object 
-                    | ID
-                    | INT ;
+                    | object
+                    | ID ;
 array               : '[' expression (',' expression)* ']' ;
 object : '{' (pair (',' pair)*)? '}' ;
 pair  : STRING ':' expression ;
@@ -42,14 +43,14 @@ condition           : expression COMPARISON_OP expression
 expression          : INT
                     | ID
                     | STRING
-                    | BOOLEAN
                     | array
                     | object
                     | '(' expression OPERATOR expression ')'
                     | expression '?' expression ':' expression ;
 
-
+LIMIT   : 'limit';
 WHILE   : 'while';
+FOR     : 'for';
 LET     : 'let' ;
 ELIF    : 'else if';
 PRINT   : 'print' ;
@@ -77,9 +78,9 @@ BOOLEAN             : 'true' | 'false' ;
 INT       : DIGIT+ ;
 STRING : '"' ( ~['\\] | '\\' . )* '"' ;
 
-fragment LETTER    : 'a' .. 'z' | 'A' .. 'Z' | '_';  
-fragment DIGIT     : '0' .. '9'; 
-ID        : LETTER (LETTER | DIGIT)* ;
+LETTER    : 'a' .. 'z' | 'A' .. 'Z' | '_';  
+DIGIT     : '0' .. '9'; 
+ID        : LETTER (LETTER | DIGIT)* ;  
 LITERAL : INT
         | STRING
         | BOOLEAN ;
