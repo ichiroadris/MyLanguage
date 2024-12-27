@@ -8,18 +8,21 @@ expression = """
 let ab = 5
 let bc = 10
 
-if(true) {
+if(1 > 5) {
   print ab
 }
 
-if(ab > 3) {
-  print bc
-}
-
-while(true) {
+for(5) {
   print ab
 }
 
+for (1 to 8 step 2) {
+  print loop
+}
+
+while (true limit 3) {
+    print 3
+}
 
 """
 input_stream = InputStream(expression)
