@@ -6,6 +6,7 @@ from MyEvaluator import Evaluator
 # Input from the user
 expression = """
 let a = (5+1)
+let ab = 10
 print "ahmed is a good guy"
 
 if(false) {
@@ -14,6 +15,22 @@ if(false) {
   print 100
 } else {
   print (10 + 2)
+}
+
+if(1 > 5) {
+  print ab
+}
+
+for(5) {
+  print ab
+}
+
+for (1 to 8 step 2) {
+  print loop
+}
+
+while (true limit 3) {
+    print 3
 }
 
 """

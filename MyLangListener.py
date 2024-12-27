@@ -44,6 +44,15 @@ class MyLangListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MyLangParser#whileLimitStatement.
+    def enterWhileLimitStatement(self, ctx:MyLangParser.WhileLimitStatementContext):
+        pass
+
+    # Exit a parse tree produced by MyLangParser#whileLimitStatement.
+    def exitWhileLimitStatement(self, ctx:MyLangParser.WhileLimitStatementContext):
+        pass
+
+
     # Enter a parse tree produced by MyLangParser#whileStatement.
     def enterWhileStatement(self, ctx:MyLangParser.WhileStatementContext):
         pass
@@ -71,21 +80,21 @@ class MyLangListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MyLangParser#forEachStatement.
-    def enterForEachStatement(self, ctx:MyLangParser.ForEachStatementContext):
+    # Enter a parse tree produced by MyLangParser#forStepStatement.
+    def enterForStepStatement(self, ctx:MyLangParser.ForStepStatementContext):
         pass
 
-    # Exit a parse tree produced by MyLangParser#forEachStatement.
-    def exitForEachStatement(self, ctx:MyLangParser.ForEachStatementContext):
+    # Exit a parse tree produced by MyLangParser#forStepStatement.
+    def exitForStepStatement(self, ctx:MyLangParser.ForStepStatementContext):
         pass
 
 
-    # Enter a parse tree produced by MyLangParser#forRangeStatement.
-    def enterForRangeStatement(self, ctx:MyLangParser.ForRangeStatementContext):
+    # Enter a parse tree produced by MyLangParser#forLoopStatement.
+    def enterForLoopStatement(self, ctx:MyLangParser.ForLoopStatementContext):
         pass
 
-    # Exit a parse tree produced by MyLangParser#forRangeStatement.
-    def exitForRangeStatement(self, ctx:MyLangParser.ForRangeStatementContext):
+    # Exit a parse tree produced by MyLangParser#forLoopStatement.
+    def exitForLoopStatement(self, ctx:MyLangParser.ForLoopStatementContext):
         pass
 
 

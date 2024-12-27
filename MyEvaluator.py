@@ -1,6 +1,7 @@
 import antlr4
 from MyLangListener import MyLangListener
 
+
 class Evaluator(MyLangListener):
     def __init__(self):
         self.environment = {}
@@ -18,10 +19,11 @@ class Evaluator(MyLangListener):
     def enterPrintStatement(self, ctx):
         value = self.evaluate_expression(ctx.expression())
         print(value)
+        
 
     # Entering a whileStatement
     def enterWhileStatement(self, ctx):
-      while self.evaluate_condition(ctx.condition()):
+        while self.evaluate_condition(ctx.condition()):
           print(f"Executing while block...")
           for stmt in ctx.statement():
               # self.process_statement(stmt)
@@ -54,7 +56,7 @@ class Evaluator(MyLangListener):
 
 
 
-    # Processing each statement
+     # Processing each statement
     def process_statement(self, stmt):
         if stmt != None:
             # You can expand this method to handle more types of statements as needed
@@ -72,8 +74,16 @@ class Evaluator(MyLangListener):
                 self.enterForEachStatement(stmt.forEachStatement())
             elif stmt.forRangeStatement():
                 self.enterForRangeStatement(stmt.forRangeStatement())
+            elif stmt.forLoopStatement():
+                self.enterForLoopStatement(stmt.forLoopStatement())
+            elif stmt.forStepStatement():
+                self.enterForStepStatement(stmt.forStepStatement())
+            elif stmt.whileLimitStatement():
+                self.enterWhileLimitStatement(stmt.whileStepStatement())
         else:
             print("Statement is null in process_statement(self, stmt)")
+        
+        
 
     # Evaluating an expression (simplified)
     def evaluate_expression(self, expr_ctx):
@@ -152,40 +162,97 @@ class Evaluator(MyLangListener):
             print("Executing default case.")
             for stmt in ctx.DEFAULT().statement():
                 self.process_statement(stmt)
-
-    def enterForEachStatement(self, ctx):
-        loop_var = ctx.ID().getText()
-        iterable = self.evaluate_expression(ctx.iterable())
+                
+    # Entering a forLoopStatement
+    def enterForLoopStatement(self, ctx):
+        print("Entering a for loop...")
         
-        for item in iterable:
-            # Create a new scope for the loop variable
-            self.environment[loop_var] = item
-            
-            # Execute the loop body
+        loop_count = ctx.INT()
+        loop_count_INT = int(loop_count.getText()) - 1
+        
+        if not isinstance(loop_count_INT, int):
+            print("Warning: parameter is not an integer.")
+            return
+
+        for i in range(loop_count_INT):
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+                
+     # Entering a forStepStatement
+    def enterForStepStatement(self, ctx):
+        print("Entering a for-step loop...")
+
+        # Parse the start, goal, and step values from the context
+        # Extract integers from the INT() tokens
+        ints = [int(token.getText()) for token in ctx.INT()]
+        if len(ints) != 3:
+            print("Error: For-step loop requires exactly 3 integers (start, goal, step).")
+            return
+
+        start, goal, step = ints
+
+        # Validate step to prevent infinite loops
+        if step <= 0:
+            print("Error: Step must be a positive integer.")
+            return
+
+        # Execute the loop
+        current = start
+        
+        while current <= goal:
+            self.environment["loop"] = current
+            # Execute the statements inside the loop
             for stmt in ctx.statement():
                 self.process_statement(stmt)
             
-        # Remove the loop variable after the loop ends
-        if loop_var in self.environment:
-            del self.environment[loop_var]
+            # Increment the current value by the step
+            current += step
+            
+        if "loop" in self.environment:
+            del self.environment["loop"]
 
-    def enterForRangeStatement(self, ctx):
-        # Extract the loop variable name
-        loop_var = ctx.ID().getText()
+    def evaluate_condition2(self, condition_ctx):
+        #print(condition_ctx)
+        #print(f"++++++++Evaluating condition: {condition_ctx.getText()}++++++++")
+        
+        # Access the children of the condition context
+        children = condition_ctx.children  # Assumes `condition_ctx` has child nodes for the condition
+        
+        if len(children) == 3:  # Typical binary condition like `1 < 2`
+            lhs = int(children[0].getText())  # Left-hand side
+            #print(lhs)
+            op = children[1].getText()  # Operator (e.g., <, >, ==, etc.)
+            rhs = int(children[2].getText())  # Right-hand side
+            
+            # Perform the comparison
+            if op == ">":
+                return lhs > rhs
+            elif op == "<":
+                return lhs < rhs
+            elif op == "==":
+                return lhs == rhs
+            elif op == "!=":
+                return lhs != rhs
+            elif op == ">=":
+                return lhs >= rhs
+            elif op == "<=":
+                return lhs <= rhs
+        elif condition_ctx.BOOLEAN():  # For boolean values
+            return condition_ctx.BOOLEAN().getText() == 'true' or 'True'
+        
+        return False  # Default return value for unsupported conditions
 
-        # Evaluate the start and end values (from and to)
-        start = int(ctx.INT(0).getText())
-        end = int(ctx.INT(1).getText())
 
-        # Iterate over the range
-        for value in range(start, end + 1):  # Assuming inclusive range
-            # Assign the loop variable in the environment
-            self.environment[loop_var] = value
-
-            # Execute the loop body
+    
+# Entering a whileLimitStatement
+    def enterWhileLimitStatement(self, ctx):
+        #print(ctx.condition().getText())
+        limit_count = ctx.INT()
+        limit = int(limit_count.getText()) - 1
+        
+        count = 0
+        # Execute the while loop as long as the condition holds true and within the limit
+        while self.evaluate_condition2(ctx.condition()) and count < limit:
             for stmt in ctx.statement():
                 self.process_statement(stmt)
-
-        # Remove the loop variable from the environment after the loop ends
-        if loop_var in self.environment:
-            del self.environment[loop_var]
+            count += 1  # Increment the loop count
