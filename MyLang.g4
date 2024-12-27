@@ -7,6 +7,8 @@ statement    : variableDeclaration
               | whileLimitStatement
               | whileStatement
               | ifElseStatement
+              | forEachStatement
+              | forRangeStatement              
               | forStepStatement
               | forLoopStatement
               | PASS;
@@ -23,6 +25,10 @@ switchStatement
         ( CASE LITERAL (statement)+ )* 
         ( DEFAULT (statement)+ )? 
       '}' END_SWITCH;
+forEachStatement
+    : 'for' '(' ID 'in' iterable ')' '{' statement* '}';
+forRangeStatement
+    : 'for' '(' ID 'from' INT 'to' INT ')' '{' statement* '}';
 forStepStatement
     : FOR '(' start=INT 'to' goal=INT 'step' step=INT ')' '{' (statement)* '}'; ///Continue Later
 forLoopStatement
@@ -34,6 +40,7 @@ comment : '//' STRING* ;
 multilineComment : '///' STRING* '///';
 iterable            : array
                     | object
+                    | INT
                     | ID ;
 array               : '[' expression (',' expression)* ']' ;
 object : '{' (pair (',' pair)*)? '}' ;

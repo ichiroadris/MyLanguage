@@ -40,7 +40,7 @@ class Evaluator(MyLangListener):
         elif ctx.ELIF():  # Elif conditions
             for i, elif_cond in enumerate(ctx.ELIF(), start=1):
                 if self.evaluate_condition(ctx.condition(i)):  # Elif condition check
-                    print(f"Elif {i} condition is true")
+                    # print(f"Elif {i} condition is true")
                     if hasattr(ctx.statement(i), '__iter__'):
                         for stmt in ctx.statement(i):  # Elif-specific statements
                             self.process_statement(stmt)
@@ -210,6 +210,42 @@ class Evaluator(MyLangListener):
             
         if "loop" in self.environment:
             del self.environment["loop"]
+
+    def enterForEachStatement(self, ctx):
+        loop_var = ctx.ID().getText()
+        iterable = self.evaluate_expression(ctx.iterable())
+        
+        for item in iterable:
+            # Create a new scope for the loop variable
+            self.environment[loop_var] = item
+            
+            # Execute the loop body
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+            # Remove the loop variable after the loop ends
+            if loop_var in self.environment:
+                del self.environment[loop_var]
+                
+    def enterForRangeStatement(self, ctx):
+        # Extract the loop variable name
+        loop_var = ctx.ID().getText()
+
+        # Evaluate the start and end values (from and to)
+        start = int(ctx.INT(0).getText())
+        end = int(ctx.INT(1).getText())
+
+        # Iterate over the range
+        for value in range(start, end + 1):  # Assuming inclusive range
+            # Assign the loop variable in the environment
+            self.environment[loop_var] = value
+
+            # Execute the loop body
+            # Execute the loop body
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+            # Remove the loop variable after the loop ends
+            if loop_var in self.environment:
+                del self.environment[loop_var]
 
     def evaluate_condition2(self, condition_ctx):
         #print(condition_ctx)
