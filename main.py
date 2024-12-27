@@ -8,14 +8,13 @@ expression = """
 let a = (5+1)
 print "ahmed is a good guy"
 
-if(1 > 5) {
+if(false) {
   print a
-} elif(1 > 5) {
-  print 5
+} else if(true) {
+  print 100
+} else {
+  print (10 + 2)
 }
-
-
-
 
 """
 input_stream = InputStream(expression)

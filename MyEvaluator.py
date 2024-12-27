@@ -4,6 +4,8 @@ from MyLangListener import MyLangListener
 class Evaluator(MyLangListener):
     def __init__(self):
         self.environment = {}
+        self.environment = {}
+        self.should_execute = True  # Track if current block should execute
 
     # Entering a variableDeclaration
     def enterVariableDeclaration(self, ctx):
@@ -28,37 +30,50 @@ class Evaluator(MyLangListener):
 
     # Entering an ifElseStatement
     def enterIfElseStatement(self, ctx):
-        if self.evaluate_condition(ctx.condition()):
-            print("Condition is true, executing if-block")
-            for stmt in ctx.statement():
-                self.process_statement(stmt)
-        else:
-            # Handle elif statements
-            print("Condition is false, checking elif blocks")
-            elif_blocks = ctx.ELIF()
-            for i, elif_cond in enumerate(elif_blocks):
-                if self.evaluate_condition(ctx.condition(i)):
-                    print(f"Condition of elif {i + 1} is true, executing elif block")
-                    for stmt in ctx.statement(i):
-                        self.process_statement(stmt)
+        if self.evaluate_condition(ctx.condition(0)):
+            statements = ctx.statement()  # Get all statements
+            num_if_statements = len(statements[0].getText().split(';'))  # Count statements in if block
+            for i in range(num_if_statements):
+                self.process_statement(statements[i])
+        elif ctx.ELIF():  # Elif conditions
+            for i, elif_cond in enumerate(ctx.ELIF(), start=1):
+                if self.evaluate_condition(ctx.condition(i)):  # Elif condition check
+                    print(f"Elif {i} condition is true")
+                    if hasattr(ctx.statement(i), '__iter__'):
+                        for stmt in ctx.statement(i):  # Elif-specific statements
+                            self.process_statement(stmt)
+                    else:
+                        self.process_statement(ctx.statement(i))
                     return
-            # Handle else block if present
-            if ctx.ELSE():
-                print("Executing else block")
-                for stmt in ctx.statement():
-                    self.process_statement(stmt)
+        elif ctx.ELSE():  # Else block
+            # elif_count = ctx.getChildCount()  # Number of elif blocks
+            # if elif_count != 0:
+            length = len(ctx.statement())  # Access the else block statements
+            stmt = ctx.statement(length-1)
+            self.process_statement(stmt)
+
+
 
     # Processing each statement
     def process_statement(self, stmt):
-        # You can expand this method to handle more types of statements as needed
-        if stmt.variableDeclaration():
-            self.enterVariableDeclaration(stmt.variableDeclaration())
-        elif stmt.printStatement():
-            self.enterPrintStatement(stmt.printStatement())
-        elif stmt.whileStatement():
-            self.enterWhileStatement(stmt.whileStatement())
-        elif stmt.ifElseStatement():
-            self.enterIfElseStatement(stmt.ifElseStatement())
+        if stmt != None:
+            # You can expand this method to handle more types of statements as needed
+            if stmt.variableDeclaration():
+                self.enterVariableDeclaration(stmt.variableDeclaration())
+            elif stmt.printStatement():
+                self.enterPrintStatement(stmt.printStatement())
+            elif stmt.whileStatement():
+                self.enterWhileStatement(stmt.whileStatement())
+            elif stmt.ifElseStatement():
+                self.enterIfElseStatement(stmt.ifElseStatement())
+            elif stmt.whileStatement():
+                self.enterWhileStatement(stmt.whileStatement())
+            elif stmt.forEachStatement():
+                self.enterForEachStatement(stmt.forEachStatement())
+            elif stmt.forRangeStatement():
+                self.enterForRangeStatement(stmt.forRangeStatement())
+        else:
+            print("Statement is null in process_statement(self, stmt)")
 
     # Evaluating an expression (simplified)
     def evaluate_expression(self, expr_ctx):
@@ -72,7 +87,8 @@ class Evaluator(MyLangListener):
                 print(f"Warning: Variable {var_name} not defined.")
                 return 0
         elif expr_ctx.STRING():
-            return expr_ctx.STRING().getText()[1:-1]  # Remove quotes
+            raw_string = expr_ctx.STRING().getText()  # Get the raw text, including quotes
+            return raw_string[1:-1]  # Remove the first and last characters (quotes)
         elif expr_ctx.BOOLEAN():
             return expr_ctx.BOOLEAN().getText() == 'true'
         elif expr_ctx.array():
@@ -94,28 +110,25 @@ class Evaluator(MyLangListener):
         return 0
 
     def evaluate_condition(self, condition_ctx):
-        print(f"++++++++Evaluating condition: {condition_ctx[0].expression(0).getText()}++++++++")
-        if condition_ctx[0].COMPARISON_OP():
-            left = self.evaluate_expression(condition_ctx[0].expression(0))
-            right = self.evaluate_expression(condition_ctx[0].expression(1))
-            op = condition_ctx[0].COMPARISON_OP().getText()
+        if isinstance(condition_ctx, list):
+            condition_ctx = condition_ctx[0]
             
-            if op == ">":
-                return left > right
-            elif op == "<":
-                return left < right
-            elif op == "==":
-                return left == right
-            elif op == "!=":
-                return left != right
-            elif op == ">=":
-                return left >= right
-            elif op == "<=":
-                return left <= right
-        elif condition_ctx.BOOLEAN():
-            return condition_ctx.BOOLEAN().getText() == 'true'
-        
-        return False
+        if condition_ctx.COMPARISON_OP():
+            left = self.evaluate_expression(condition_ctx.expression(0))
+            right = self.evaluate_expression(condition_ctx.expression(1))
+            op = condition_ctx.COMPARISON_OP().getText()
+            
+            operators = {
+                ">": lambda x, y: x > y,
+                "<": lambda x, y: x < y,
+                "==": lambda x, y: x == y,
+                "!=": lambda x, y: x != y,
+                ">=": lambda x, y: x >= y,
+                "<=": lambda x, y: x <= y
+            }
+            return operators[op](left, right)
+            
+        return condition_ctx.BOOLEAN().getText() == 'true'
 
           
       # Inspect the children of the condition

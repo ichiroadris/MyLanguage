@@ -75,7 +75,7 @@ COMPARISON_OP  : '>'
                     | '<=' ;
 BOOLEAN             : 'true' | 'false' ;
 INT       : DIGIT+ ;
-STRING : '"' ( ~['\\] | '\\' . )* '"' ;
+STRING : '"' ( ~["\r\n\\] | '\\' . )* '"' ;
 
 fragment LETTER    : 'a' .. 'z' | 'A' .. 'Z' | '_';  
 fragment DIGIT     : '0' .. '9'; 
