@@ -101,6 +101,10 @@ class Evaluator(MyLangListener):
                 self.enterForStepStatement(stmt.forStepStatement())
             elif stmt.whileLimitStatement():
                 self.enterWhileLimitStatement(stmt.whileStepStatement())
+            elif stmt.unlessStatement():
+                self.enterUnlessStatement(stmt.unlessStatement())
+            elif stmt.doWhileStatement():  
+                self.enterDoWhileStatement(stmt.doWhileStatement())
         else:
             print("Statement is null in process_statement(self, stmt)")
         
@@ -167,6 +171,29 @@ class Evaluator(MyLangListener):
 
       
     # Continue with the evaluation...
+
+    # Handle a doWhileStatement 
+    def enterDoWhileStatement(self, ctx):
+        first_run = True
+        while True:  # runs at least once
+            print(f"Executing do-while block...")
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+
+            # Check the condition after executing the block 
+            if not first_run:
+                if not self.evaluate_condition(ctx.condition()):
+                    break  # Exit the loop if condition is False
+            first_run = False
+
+    # Handle unless statement
+    def enterUnlessStatement(self, ctx):
+        condition = self.evaluate_condition(ctx.condition())
+        if not condition:  # Execute the block only if the condition is False
+            print("Executing unless block...")
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+
 
 
     # Handle switch statement
