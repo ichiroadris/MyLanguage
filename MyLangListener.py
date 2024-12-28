@@ -80,6 +80,33 @@ class MyLangListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MyLangParser#caseBlock.
+    def enterCaseBlock(self, ctx:MyLangParser.CaseBlockContext):
+        pass
+
+    # Exit a parse tree produced by MyLangParser#caseBlock.
+    def exitCaseBlock(self, ctx:MyLangParser.CaseBlockContext):
+        pass
+
+
+    # Enter a parse tree produced by MyLangParser#defaultBlock.
+    def enterDefaultBlock(self, ctx:MyLangParser.DefaultBlockContext):
+        pass
+
+    # Exit a parse tree produced by MyLangParser#defaultBlock.
+    def exitDefaultBlock(self, ctx:MyLangParser.DefaultBlockContext):
+        pass
+
+
+    # Enter a parse tree produced by MyLangParser#passStatement.
+    def enterPassStatement(self, ctx:MyLangParser.PassStatementContext):
+        pass
+
+    # Exit a parse tree produced by MyLangParser#passStatement.
+    def exitPassStatement(self, ctx:MyLangParser.PassStatementContext):
+        pass
+
+
     # Enter a parse tree produced by MyLangParser#forStepStatement.
     def enterForStepStatement(self, ctx:MyLangParser.ForStepStatementContext):
         pass
