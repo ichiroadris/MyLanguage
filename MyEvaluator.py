@@ -236,6 +236,8 @@ class Evaluator(MyLangListener):
         loop_var = ctx.ID().getText()
         iterable = self.evaluate_expression(ctx.iterable())
         
+        MyGlobals.inside_block_flag = False
+
         for item in iterable:
             # Create a new scope for the loop variable
             self.environment[loop_var] = item
@@ -243,9 +245,12 @@ class Evaluator(MyLangListener):
             # Execute the loop body
             for stmt in ctx.statement():
                 self.process_statement(stmt)
-            # Remove the loop variable after the loop ends
-            if loop_var in self.environment:
-                del self.environment[loop_var]
+
+        MyGlobals.inside_block_flag = True
+        
+        # Remove the loop variable after the loop ends
+        if loop_var in self.environment:
+            del self.environment[loop_var]
         
     # Updated enterForRangeStatement method
     def enterForRangeStatement(self, ctx):
