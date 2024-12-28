@@ -246,32 +246,33 @@ class Evaluator(MyLangListener):
             # Remove the loop variable after the loop ends
             if loop_var in self.environment:
                 del self.environment[loop_var]
-                
+        
+    # Updated enterForRangeStatement method
     def enterForRangeStatement(self, ctx):
-        # Extract the loop variable name
         loop_var = ctx.ID().getText()
-
-        # Evaluate the start and end values (from and to)
         start = int(ctx.INT(0).getText())
         end = int(ctx.INT(1).getText())
 
-        # Determine the iteration step (1 for ascending, -1 for descending)
+        # Determine the step based on the range direction
         step = 1 if start <= end else -1
 
-        # Iterate over the range
-        if step == 1:
-            for value in range(start, end + 1):  # Ascending: inclusive range
-                self.environment[loop_var] = value
-                for stmt in ctx.statement():
-                    self.process_statement(stmt)
-        else:
-            for value in range(start, end - 1, step):  # Descending: exclusive of end
-                self.environment[loop_var] = value
-                for stmt in ctx.statement():
-                    self.process_statement(stmt)
-        
-        # Remove the loop variable after the loop ends
-        del self.environment[loop_var]
+        MyGlobals.inside_block_flag = False
+
+        # Iterate over the range (inclusive for both ascending and descending)
+        for value in range(start, end + step, step):
+            # Set the loop variable in the environment
+            self.environment[loop_var] = value
+
+            # Process all statements in the loop body
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+
+        # Reset the block flag after exiting the loop
+        MyGlobals.inside_block_flag = True
+
+        # Remove the loop variable from the environment
+        if loop_var in self.environment:
+            del self.environment[loop_var]
 
     def evaluate_condition2(self, condition_ctx):
         #print(condition_ctx)

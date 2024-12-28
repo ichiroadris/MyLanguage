@@ -25,10 +25,10 @@ switchStatement
         ( CASE LITERAL (statement)+ )* 
         ( DEFAULT (statement)+ )? 
       '}' END_SWITCH;
+forRangeStatement
+    : 'for' '(' ID 'from' INT 'to' INT ')' '{' statement* '}' ;
 forEachStatement
     : 'for' '(' ID 'in' iterable ')' '{' statement* '}';
-forRangeStatement
-    : 'for' '(' ID 'from' INT 'to' INT ')' '{' statement* '}';
 forStepStatement
     : FOR '(' start=INT 'to' goal=INT 'step' step=INT ')' block; ///Continue Later
 forLoopStatement
