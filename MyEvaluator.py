@@ -1,5 +1,6 @@
 import antlr4
 from MyLangListener import MyLangListener
+import MyGlobals as MyGlobals
 
 
 class Evaluator(MyLangListener):
@@ -13,46 +14,66 @@ class Evaluator(MyLangListener):
         var_name = ctx.ID().getText()
         value = self.evaluate_expression(ctx.expression())
         self.environment[var_name] = value
-        print(f"Declared variable {var_name} with value {value}")
+        # print(f"Declared variable {var_name} with value {value}")
 
     # Entering a printStatement
     def enterPrintStatement(self, ctx):
-        value = self.evaluate_expression(ctx.expression())
-        print(value)
+        # print(MyGlobals.inside_block_flag)
+        if (not MyGlobals.inside_block_flag):
+            value = self.evaluate_expression(ctx.expression())
+            print(value)
         
 
     # Entering a whileStatement
     def enterWhileStatement(self, ctx):
-        while self.evaluate_condition(ctx.condition()):
-          print(f"Executing while block...")
-          for stmt in ctx.statement():
-              # self.process_statement(stmt)
-              print(stmt.getText())
+        # Initialize a loop counter to track iterations
+        loop_count = 0
+        max_iterations = 100  # Safety limit to prevent infinite loops
+        
+        while (self.evaluate_condition(ctx.condition()) and loop_count < max_iterations):
+            # print(f"Loop iteration: {loop_count}")
+            
+            # Store the loop count in environment for access within the loop
+            self.environment['_loop_count'] = loop_count
+            
+            # Execute all statements in the while block
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+                
+            loop_count += 1
+            
+            # Safety check
+            if loop_count >= max_iterations:
+                print("Warning: Maximum iteration limit reached")
+                break
+                
+        # Clean up the loop counter from environment
+        if '_loop_count' in self.environment:
+            del self.environment['_loop_count']
 
 
     # Entering an ifElseStatement
     def enterIfElseStatement(self, ctx):
         if self.evaluate_condition(ctx.condition(0)):
-            statements = ctx.statement()  # Get all statements
-            num_if_statements = len(statements[0].getText().split(';'))  # Count statements in if block
+            statements = ctx.block(0).statement()  # Get all statements in the if block
+            num_if_statements = len(statements)  # Count statements in if block
             for i in range(num_if_statements):
                 self.process_statement(statements[i])
         elif ctx.ELIF():  # Elif conditions
             for i, elif_cond in enumerate(ctx.ELIF(), start=1):
                 if self.evaluate_condition(ctx.condition(i)):  # Elif condition check
                     # print(f"Elif {i} condition is true")
-                    if hasattr(ctx.statement(i), '__iter__'):
-                        for stmt in ctx.statement(i):  # Elif-specific statements
+                    if hasattr(ctx.block(i).statement(), '__iter__'):
+                        for stmt in ctx.block(i).statement():  # Elif-specific statements
                             self.process_statement(stmt)
                     else:
-                        self.process_statement(ctx.statement(i))
+                        self.process_statement(ctx.block(i).statement())
                     return
         elif ctx.ELSE():  # Else block
-            # elif_count = ctx.getChildCount()  # Number of elif blocks
-            # if elif_count != 0:
-            length = len(ctx.statement())  # Access the else block statements
-            stmt = ctx.statement(length-1)
-            self.process_statement(stmt)
+            length = len(ctx.block())  # Access the else block statements
+            stmt = ctx.block(length-1).statement()
+            for s in stmt:
+                self.process_statement(s)
 
 
 

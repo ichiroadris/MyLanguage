@@ -5,35 +5,22 @@ from MyEvaluator import Evaluator
 
 # Input from the user
 expression = """
-let a = (5+1)
-let ab = 10
-print "ahmed is a good guy"
+let c = 0
 
 if(false) {
-  print a
-} else if(true) {
   print 100
+} else if(true) {
+  print 99
 } else {
-  print (10 + 2)
+  print "I am dumb : : )"
 }
 
-if(1 > 5) {
-  print ab
+while(c < 5) {
+  let c = (c+1)
+  print "I am while loop"
 }
-
-for(5) {
-  print ab
-}
-
-for (1 to 8 step 2) {
-  print loop
-}
-
-while (true limit 3) {
-    print 3
-}
-
 """
+
 input_stream = InputStream(expression)
 
 # Lexical and syntactical analysis

@@ -1,3 +1,4 @@
+import MyGlobals as MyGlobals
 # Generated from MyLang.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
@@ -113,6 +114,16 @@ class MyLangListener(ParseTreeListener):
 
     # Exit a parse tree produced by MyLangParser#forLoopStatement.
     def exitForLoopStatement(self, ctx:MyLangParser.ForLoopStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by MyLangParser#block.
+    def enterBlock(self, ctx:MyLangParser.BlockContext):
+        MyGlobals.inside_block_flag = True
+
+    # Exit a parse tree produced by MyLangParser#block.
+    def exitBlock(self, ctx:MyLangParser.BlockContext):
+        MyGlobals.inside_block_flag = False
         pass
 
 

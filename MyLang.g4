@@ -17,9 +17,9 @@ printStatement      : PRINT expression;
 whileLimitStatement : WHILE '(' condition LIMIT INT')' '{' statement+ '}';
 whileStatement : WHILE '(' condition ')' '{' (statement)* '}' ;
 ifElseStatement 
-    : IF '(' condition ')' '{' (statement)* '}'
-      ( ELIF '(' condition ')' '{' (statement)* '}' )*
-      ( ELSE '{' (statement)* '}' )? ;
+    : IF '(' condition ')' block
+      ( ELIF '(' condition ')' block )*
+      ( ELSE block )? ;
 switchStatement 
     : SWITCH '(' expression ')' '{' 
         ( CASE LITERAL (statement)+ )* 
@@ -30,9 +30,10 @@ forEachStatement
 forRangeStatement
     : 'for' '(' ID 'from' INT 'to' INT ')' '{' statement* '}';
 forStepStatement
-    : FOR '(' start=INT 'to' goal=INT 'step' step=INT ')' '{' (statement)* '}'; ///Continue Later
+    : FOR '(' start=INT 'to' goal=INT 'step' step=INT ')' block; ///Continue Later
 forLoopStatement
     : FOR '(' INT ')' '{' (statement)* '}';
+block : '{' (statement)* '}';
 
 
 
