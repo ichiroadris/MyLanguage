@@ -8,7 +8,9 @@ expression = """
 for (i from 1 to 3) {
   print i
 }
-
+for (i from 3 to 1) {
+  print i
+}
 """
 input_stream = InputStream(expression)
 

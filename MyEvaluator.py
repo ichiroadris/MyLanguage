@@ -255,18 +255,23 @@ class Evaluator(MyLangListener):
         start = int(ctx.INT(0).getText())
         end = int(ctx.INT(1).getText())
 
-        # Iterate over the range
-        for value in range(start, end + 1):  # Assuming inclusive range
-            # Assign the loop variable in the environment
-            self.environment[loop_var] = value
+        # Determine the iteration step (1 for ascending, -1 for descending)
+        step = 1 if start <= end else -1
 
-            # Execute the loop body
-            # Execute the loop body
-            for stmt in ctx.statement():
-                self.process_statement(stmt)
-            # Remove the loop variable after the loop ends
-            if loop_var in self.environment:
-                del self.environment[loop_var]
+        # Iterate over the range
+        if step == 1:
+            for value in range(start, end + 1):  # Ascending: inclusive range
+                self.environment[loop_var] = value
+                for stmt in ctx.statement():
+                    self.process_statement(stmt)
+        else:
+            for value in range(start, end - 1, step):  # Descending: exclusive of end
+                self.environment[loop_var] = value
+                for stmt in ctx.statement():
+                    self.process_statement(stmt)
+        
+        # Remove the loop variable after the loop ends
+        del self.environment[loop_var]
 
     def evaluate_condition2(self, condition_ctx):
         #print(condition_ctx)
