@@ -52,28 +52,35 @@ class Evaluator(MyLangListener):
             del self.environment['_loop_count']
 
 
-    # Entering an ifElseStatement
     def enterIfElseStatement(self, ctx):
+        # First check if the main 'if' condition is true
         if self.evaluate_condition(ctx.condition(0)):
-            statements = ctx.block(0).statement()  # Get all statements in the if block
-            num_if_statements = len(statements)  # Count statements in if block
-            for i in range(num_if_statements):
-                self.process_statement(statements[i])
-        elif ctx.ELIF():  # Elif conditions
+            statements = ctx.block(0).statement()
+            for statement in statements:
+                self.process_statement(statement)
+            return  # Exit after processing if block
+        
+        # If main 'if' was false, check all elif conditions
+        elif_conditions_met = False
+        if ctx.ELIF():
             for i, elif_cond in enumerate(ctx.ELIF(), start=1):
-                if self.evaluate_condition(ctx.condition(i)):  # Elif condition check
-                    # print(f"Elif {i} condition is true")
+                if self.evaluate_condition(ctx.condition(i)):
+                    elif_conditions_met = True
                     if hasattr(ctx.block(i).statement(), '__iter__'):
-                        for stmt in ctx.block(i).statement():  # Elif-specific statements
+                        for stmt in ctx.block(i).statement():
                             self.process_statement(stmt)
                     else:
                         self.process_statement(ctx.block(i).statement())
-                    return
-        if ctx.ELSE():  # Else block
-            length = len(ctx.block())  # Access the else block statements
-            stmt = ctx.block(length-1).statement()
-            for s in stmt:
-                self.process_statement(s)
+                    break  # Exit after processing matching elif block
+        
+        # If no if/elif conditions were met, process else block if it exists
+        if not elif_conditions_met and ctx.ELSE():
+            last_block = ctx.block()[-1]  # Get the last block (else block)
+            if hasattr(last_block.statement(), '__iter__'):
+                for stmt in last_block.statement():
+                    self.process_statement(stmt)
+            else:
+                self.process_statement(last_block.statement())
 
 
 
