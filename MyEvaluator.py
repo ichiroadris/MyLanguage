@@ -19,9 +19,6 @@ class Evaluator(MyLangListener):
     # Entering a printStatement
     def enterPrintStatement(self, ctx):
         # Skip printing if we're walking back up the tree after while loop completion
-        if MyGlobals.tree_walking_back:
-            return
-        
         if (not MyGlobals.inside_block_flag):
             value = self.evaluate_expression(ctx.expression())
             print(value)

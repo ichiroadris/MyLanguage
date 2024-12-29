@@ -1,5 +1,5 @@
-# Generated from MyLang.g4 by ANTLR 4.13.2
 import MyGlobals as MyGlobals
+# Generated from MyLang.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .MyLangParser import MyLangParser
@@ -58,6 +58,10 @@ class MyLangListener(ParseTreeListener):
     def enterWhileStatement(self, ctx:MyLangParser.WhileStatementContext):
         pass
 
+    # Exit a parse tree produced by MyLangParser#whileStatement.
+    def exitWhileStatement(self, ctx:MyLangParser.WhileStatementContext):
+        pass
+
 
     # Enter a parse tree produced by MyLangParser#ifElseStatement.
     def enterIfElseStatement(self, ctx:MyLangParser.IfElseStatementContext):
@@ -77,21 +81,21 @@ class MyLangListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MyLangParser#forRangeStatement.
-    def enterForRangeStatement(self, ctx:MyLangParser.ForRangeStatementContext):
-        pass
-
-    # Exit a parse tree produced by MyLangParser#forRangeStatement.
-    def exitForRangeStatement(self, ctx:MyLangParser.ForRangeStatementContext):
-        pass
-
-
     # Enter a parse tree produced by MyLangParser#forEachStatement.
     def enterForEachStatement(self, ctx:MyLangParser.ForEachStatementContext):
         pass
 
     # Exit a parse tree produced by MyLangParser#forEachStatement.
     def exitForEachStatement(self, ctx:MyLangParser.ForEachStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by MyLangParser#forRangeStatement.
+    def enterForRangeStatement(self, ctx:MyLangParser.ForRangeStatementContext):
+        pass
+
+    # Exit a parse tree produced by MyLangParser#forRangeStatement.
+    def exitForRangeStatement(self, ctx:MyLangParser.ForRangeStatementContext):
         pass
 
 
@@ -113,11 +117,6 @@ class MyLangListener(ParseTreeListener):
         pass
 
 
-    # Exit a parse tree produced by MyLangParser#whileStatement.
-    def exitWhileStatement(self, ctx:MyLangParser.WhileStatementContext):
-        # Reset flags when completely exiting the while statement
-        MyGlobals.tree_walking_back = False
-        pass
     # Enter a parse tree produced by MyLangParser#block.
     def enterBlock(self, ctx:MyLangParser.BlockContext):
         MyGlobals.inside_block_flag = True
@@ -145,6 +144,7 @@ class MyLangListener(ParseTreeListener):
     # Exit a parse tree produced by MyLangParser#doWhileStatement.
     def exitDoWhileStatement(self, ctx:MyLangParser.DoWhileStatementContext):
         pass
+
 
     # Enter a parse tree produced by MyLangParser#comment.
     def enterComment(self, ctx:MyLangParser.CommentContext):
