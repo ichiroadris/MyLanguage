@@ -43,7 +43,8 @@ iterable            : array
                     | object
                     | INT
                     | ID ;
-array               : '[' expression (',' expression)* ']' ;
+array               : '[' (expression (',' expression)*)? ']'
+                    | '[' ']' ;
 object : '{' (pair (',' pair)*)? '}' ;
 pair  : STRING ':' expression ;
 condition           : expression COMPARISON_OP expression

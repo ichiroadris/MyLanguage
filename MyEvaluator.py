@@ -217,7 +217,6 @@ class Evaluator(MyLangListener):
                 for stmt in block.statement():
                     self.process_statement(stmt)
                 
-     # Entering a forStepStatement
     def enterForStepStatement(self, ctx):
 
         # Parse the start, goal, and step values from the context
@@ -226,28 +225,30 @@ class Evaluator(MyLangListener):
         if len(ints) != 3:
             print("Error: For-step loop requires exactly 3 integers (start, goal, step).")
             return
-
+        
         start, goal, step = ints
 
-        # Validate step to prevent infinite loops
-        if step <= 0:
-            print("Error: Step must be a positive integer.")
-            return
+        if start > goal:
+            step = step * -1
+            goal = goal - 1 
+        else:
+            goal = goal + 1
+        # Iterate over the range
+        for value in range(start, goal, step):  # Assuming inclusive range
+            # Assign the loop variable in the environment
+            self.environment["loop"] = value
 
-        # Execute the loop
-        current = start
-        
-        while current <= goal:
-            self.environment["loop"] = current
+            # Execute the loop body
+            # Execute the loop body
             block = ctx.block()  # Access the block
             if block:
                 for stmt in block.statement():
                     self.process_statement(stmt) 
-            current += step  # Increment the loop count
+            # Remove the loop variable after the loop ends
             
         if "loop" in self.environment:
             del self.environment["loop"]
-
+            
     def enterForEachStatement(self, ctx):
         loop_var = ctx.ID().getText()
         iterable = self.evaluate_expression(ctx.iterable())
@@ -272,9 +273,9 @@ class Evaluator(MyLangListener):
         # Evaluate the start and end values (from and to)
         start = int(ctx.INT(0).getText())
         end = int(ctx.INT(1).getText())
-
+        step = 1 if start <= end else -1
         # Iterate over the range
-        for value in range(start, end + 1):  # Assuming inclusive range
+        for value in range(start, end + step, step):  # Assuming inclusive range
             # Assign the loop variable in the environment
             self.environment[loop_var] = value
 
