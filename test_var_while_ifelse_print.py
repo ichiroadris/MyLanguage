@@ -101,7 +101,98 @@ def test_nested_control_structures():
     """
     output = execute_expression(expression)
     assert output == "0\none\n2\n"
+    
+    
+###Print Statements
+def test_basic_print():
+    # Test printing simple values
+    expression = """
+    print 42
+    """
+    output = execute_expression(expression)
+    assert output == "42\n"
+    
+def test_print_in_while_loop():
+    # Test printing within a while loop
+    expression = """
+    let i = 0
+    while (i < 3) {
+        print i
+        let i = (i + 1)
+    }
+    """
+    output = execute_expression(expression)
+    assert output == "0\n1\n2\n"
+    
+def test_print_after_while():
+    # Test printing after while loop to ensure no extra prints
+    expression = """
+    let i = 0
+    while (i < 2) {
+        print i
+        let i = (i + 1)
+    }
+    print "done"
+    """
+    output = execute_expression(expression)
+    assert output == "0\n1\ndone\n"
+def test_print_in_if_else():
+    # Test printing in conditional blocks
+    expression = """
+    let x = 5
+    if (x > 3) {
+        print "greater"
+    } else {
+        print "lesser"
+    }
+    """
+    output = execute_expression(expression)
+    assert output == "greater\n"    
 
+def test_print_expression():
+    # Test printing complex expressions
+    expression = """
+    let x = 5
+    print (x + 3)
+    """
+    output = execute_expression(expression)
+    assert output == "8\n"
+    
+def test_print_array():
+    # Test printing array values
+    expression = """
+    let arr = [1, 2, 3]
+    print arr
+    """
+    output = execute_expression(expression)
+    assert output == "[1, 2, 3]\n"
+    
+def test_print_in_nested_while():
+    # Test printing in nested while loops
+    expression = """
+    let i = 0
+    while (i < 2) {
+        let j = 0
+        while (j < 2) {
+            print j
+            let j = (j + 1)
+        }
+        let i = (i + 1)
+    }
+    """
+    output = execute_expression(expression)
+    assert output == "0\n1\n0\n1\n0\n1\n"
+
+def test_multiple_prints():
+    # Test multiple consecutive print statements
+    expression = """
+    print 1
+    print 2
+    print 3
+    """
+    output = execute_expression(expression)
+    assert output == "1\n2\n3\n"
+    
 # def test_object_declaration():
 #     expression = """
 #     let obj = {"name": "test", "value": 42}

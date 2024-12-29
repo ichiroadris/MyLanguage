@@ -1,4 +1,3 @@
-import MyGlobals as MyGlobals
 # Generated from MyLang.g4 by ANTLR 4.13.2
 # encoding: utf-8
 from antlr4 import *
@@ -484,7 +483,6 @@ class MyLangParser ( Parser ):
         def getRuleIndex(self):
             return MyLangParser.RULE_printStatement
 
-        
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterPrintStatement" ):
                 listener.enterPrintStatement(self)
