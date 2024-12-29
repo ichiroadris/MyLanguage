@@ -18,7 +18,10 @@ class Evaluator(MyLangListener):
 
     # Entering a printStatement
     def enterPrintStatement(self, ctx):
-        # print(MyGlobals.inside_block_flag)
+        # Skip printing if we're walking back up the tree after while loop completion
+        if MyGlobals.tree_walking_back:
+            return
+        
         if (not MyGlobals.inside_block_flag):
             value = self.evaluate_expression(ctx.expression())
             print(value)
@@ -26,14 +29,15 @@ class Evaluator(MyLangListener):
 
     # Entering a whileStatement
     def enterWhileStatement(self, ctx):
-        # Initialize a loop counter to track iterations
         loop_count = 0
-        max_iterations = 100  # Safety limit to prevent infinite loops
+        max_iterations = 100
+        MyGlobals.tree_walking_back = False  # Reset at start of while
         
-        while (self.evaluate_condition(ctx.condition()) and loop_count < max_iterations):
-            # print(f"Loop iteration: {loop_count}")
+        while loop_count < max_iterations:
+            # Check condition first
+            if not self.evaluate_condition(ctx.condition()):
+                break
             
-            # Store the loop count in environment for access within the loop
             self.environment['_loop_count'] = loop_count
             
             # Execute all statements in the while block
@@ -41,15 +45,14 @@ class Evaluator(MyLangListener):
                 self.process_statement(stmt)
                 
             loop_count += 1
-            
-            # Safety check
-            if loop_count >= max_iterations:
-                print("Warning: Maximum iteration limit reached")
-                break
-                
-        # Clean up the loop counter from environment
+        
+        if loop_count >= max_iterations:
+            print("Warning: Maximum iteration limit reached")
+        
+        # Clean up and set flags
         if '_loop_count' in self.environment:
             del self.environment['_loop_count']
+            MyGlobals.tree_walking_back = True  # Set walking back flag
 
 
     def enterIfElseStatement(self, ctx):
