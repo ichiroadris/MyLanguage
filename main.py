@@ -7,6 +7,15 @@ from MyEvaluator import Evaluator
 expression = """
 let c = 0
 
+let x = 5
+if (x > 10) {
+    print "greater than 10"
+} else if (x > 5) {
+    print "greater than 5"
+} else {
+    print "5 or less"
+}
+    
 if(false) {
   print 100
 } else if(true) {
@@ -15,10 +24,13 @@ if(false) {
   print "I am dumb : : )"
 }
 
-while(c < 5) {
+while(c < 1) {
   let c = (c+1)
   print "I am while loop"
+  print c
 }
+
+print "ahmed"
 """
 
 input_stream = InputStream(expression)
