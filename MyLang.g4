@@ -11,6 +11,8 @@ statement    : variableDeclaration
               | forRangeStatement              
               | forStepStatement
               | forLoopStatement
+              | unlessStatement
+              | doWhileStatement
               | PASS;
 variableDeclaration : LET ID '=' expression;
 printStatement      : PRINT expression;
@@ -34,7 +36,9 @@ forStepStatement
 forLoopStatement
     : FOR '(' INT ')' block;
 block : '{' (statement)* '}';
-
+unlessStatement      
+    : 'unless' '(' condition ')' '{' statement* '}';
+doWhileStatement : 'do' '{' statement* '}' 'while' '(' condition ')';
 
 
 comment : '//' STRING* ;
