@@ -58,10 +58,6 @@ class MyLangListener(ParseTreeListener):
     def enterWhileStatement(self, ctx:MyLangParser.WhileStatementContext):
         pass
 
-    # Exit a parse tree produced by MyLangParser#whileStatement.
-    def exitWhileStatement(self, ctx:MyLangParser.WhileStatementContext):
-        pass
-
 
     # Enter a parse tree produced by MyLangParser#ifElseStatement.
     def enterIfElseStatement(self, ctx:MyLangParser.IfElseStatementContext):
@@ -117,6 +113,11 @@ class MyLangListener(ParseTreeListener):
         pass
 
 
+    # Exit a parse tree produced by MyLangParser#whileStatement.
+    def exitWhileStatement(self, ctx:MyLangParser.WhileStatementContext):
+        # Reset flags when completely exiting the while statement
+        MyGlobals.tree_walking_back = False
+        pass
     # Enter a parse tree produced by MyLangParser#block.
     def enterBlock(self, ctx:MyLangParser.BlockContext):
         MyGlobals.inside_block_flag = True
