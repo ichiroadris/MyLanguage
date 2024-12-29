@@ -1,14 +1,19 @@
 from antlr4 import *
 from MyLangLexer import MyLangLexer
 from MyLangParser import MyLangParser
-from MyEvaluator_copy import Evaluator
+from MyEvaluator import Evaluator
 
 # Input from the user
 expression = """
 for (i from 1 to 3) {
   print i
 }
-
+for (i from 3 to 1) {
+  print i
+}
+for (i from 1 to 1) {
+  print i
+}
 """
 input_stream = InputStream(expression)
 

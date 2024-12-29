@@ -7,6 +7,8 @@ statement    : variableDeclaration
               | whileLimitStatement
               | whileStatement
               | ifElseStatement
+              | forEachStatement
+              | forRangeStatement              
               | forStepStatement
               | forLoopStatement
               | PASS;
@@ -15,18 +17,23 @@ printStatement      : PRINT expression;
 whileLimitStatement : WHILE '(' condition LIMIT INT')' '{' statement+ '}';
 whileStatement : WHILE '(' condition ')' '{' (statement)* '}' ;
 ifElseStatement 
-    : IF '(' condition ')' '{' (statement)* '}'
-      ( ELIF '(' condition ')' '{' (statement)* '}' )*
-      ( ELSE '{' (statement)* '}' )? ;
+    : IF '(' condition ')' block
+      ( ELIF '(' condition ')' block )*
+      ( ELSE block )? ;
 switchStatement 
     : SWITCH '(' expression ')' '{' 
         ( CASE LITERAL (statement)+ )* 
         ( DEFAULT (statement)+ )? 
       '}' END_SWITCH;
+forRangeStatement
+    : 'for' '(' ID 'from' INT 'to' INT ')' '{' statement* '}' ;
+forEachStatement
+    : 'for' '(' ID 'in' iterable ')' '{' statement* '}';
 forStepStatement
-    : FOR '(' start=INT 'to' goal=INT 'step' step=INT ')' '{' (statement)* '}'; ///Continue Later
+    : FOR '(' start=INT 'to' goal=INT 'step' step=INT ')' block; ///Continue Later
 forLoopStatement
     : FOR '(' INT ')' '{' (statement)* '}';
+block : '{' (statement)* '}';
 
 
 
@@ -34,15 +41,18 @@ comment : '//' STRING* ;
 multilineComment : '///' STRING* '///';
 iterable            : array
                     | object
+                    | INT
                     | ID ;
-array               : '[' expression (',' expression)* ']' ;
+array               : '[' (expression (',' expression)*)? ']'
+                    | '[' ']' ;
 object : '{' (pair (',' pair)*)? '}' ;
 pair  : STRING ':' expression ;
 condition           : expression COMPARISON_OP expression
                     | BOOLEAN ;
 expression          : INT
-                    | ID
                     | STRING
+                    | ID
+                    | BOOLEAN
                     | array
                     | object
                     | '(' expression OPERATOR expression ')'
@@ -76,10 +86,10 @@ COMPARISON_OP  : '>'
                     | '<=' ;
 BOOLEAN             : 'true' | 'false' ;
 INT       : DIGIT+ ;
-STRING : '"' ( ~['\\] | '\\' . )* '"' ;
+STRING : '"' ( ~["\r\n\\] | '\\' . )* '"' ;
 
-LETTER    : 'a' .. 'z' | 'A' .. 'Z' | '_';  
-DIGIT     : '0' .. '9'; 
+fragment LETTER    : 'a' .. 'z' | 'A' .. 'Z' | '_';  
+fragment DIGIT     : '0' .. '9'; 
 ID        : LETTER (LETTER | DIGIT)* ;  
 LITERAL : INT
         | STRING

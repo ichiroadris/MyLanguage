@@ -1,73 +1,110 @@
 import antlr4
 from MyLangListener import MyLangListener
+import MyGlobals as MyGlobals
 
 
 class Evaluator(MyLangListener):
     def __init__(self):
         self.environment = {}
+        self.environment = {}
+        self.should_execute = True  # Track if current block should execute
 
     # Entering a variableDeclaration
     def enterVariableDeclaration(self, ctx):
         var_name = ctx.ID().getText()
         value = self.evaluate_expression(ctx.expression())
         self.environment[var_name] = value
-        print(f"Declared variable {var_name} with value {value}")
+        # print(f"Declared variable {var_name} with value {value}")
 
     # Entering a printStatement
     def enterPrintStatement(self, ctx):
-        value = self.evaluate_expression(ctx.expression())
-        print(value)
+        # print(MyGlobals.inside_block_flag)
+        if (not MyGlobals.inside_block_flag):
+            value = self.evaluate_expression(ctx.expression())
+            print(value)
         
 
     # Entering a whileStatement
     def enterWhileStatement(self, ctx):
-        while self.evaluate_condition(ctx.condition()):
-          print(f"Executing while block...")
-          for stmt in ctx.statement():
-              # self.process_statement(stmt)
-              while(True):
-                  print(5)
+        # Initialize a loop counter to track iterations
+        loop_count = 0
+        max_iterations = 100  # Safety limit to prevent infinite loops
+        
+        while (self.evaluate_condition(ctx.condition()) and loop_count < max_iterations):
+            # print(f"Loop iteration: {loop_count}")
+            
+            # Store the loop count in environment for access within the loop
+            self.environment['_loop_count'] = loop_count
+            
+            # Execute all statements in the while block
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+                
+            loop_count += 1
+            
+            # Safety check
+            if loop_count >= max_iterations:
+                print("Warning: Maximum iteration limit reached")
+                break
+                
+        # Clean up the loop counter from environment
+        if '_loop_count' in self.environment:
+            del self.environment['_loop_count']
 
 
     # Entering an ifElseStatement
     def enterIfElseStatement(self, ctx):
-        print(ctx.condition())
-        if self.evaluate_condition(ctx.condition()):
-            print("Condition is true, executing if-block")
-            for stmt in ctx.statement():
-                self.process_statement(stmt)
-        else:
-            # Handle elif statements
-            print("Condition is false, checking elif blocks")
-            elif_blocks = ctx.ELIF()
-            for i, elif_cond in enumerate(elif_blocks):
-                if self.evaluate_condition(ctx.condition(i)):
-                    print(f"Condition of elif {i + 1} is true, executing elif block")
-                    for stmt in ctx.statement(i):
-                        self.process_statement(stmt)
+        if self.evaluate_condition(ctx.condition(0)):
+            statements = ctx.block(0).statement()  # Get all statements in the if block
+            num_if_statements = len(statements)  # Count statements in if block
+            for i in range(num_if_statements):
+                self.process_statement(statements[i])
+        elif ctx.ELIF():  # Elif conditions
+            for i, elif_cond in enumerate(ctx.ELIF(), start=1):
+                if self.evaluate_condition(ctx.condition(i)):  # Elif condition check
+                    # print(f"Elif {i} condition is true")
+                    if hasattr(ctx.block(i).statement(), '__iter__'):
+                        for stmt in ctx.block(i).statement():  # Elif-specific statements
+                            self.process_statement(stmt)
+                    else:
+                        self.process_statement(ctx.block(i).statement())
                     return
-            # Handle else block if present
-            if ctx.ELSE():
-                print("Executing else block")
-                for stmt in ctx.statement():
-                    self.process_statement(stmt)
+        elif ctx.ELSE():  # Else block
+            length = len(ctx.block())  # Access the else block statements
+            stmt = ctx.block(length-1).statement()
+            for s in stmt:
+                self.process_statement(s)
+
+
 
      # Processing each statement
     def process_statement(self, stmt):
-        if stmt.variableDeclaration():
-            self.enterVariableDeclaration(stmt.variableDeclaration())
-        elif stmt.printStatement():
-            self.enterPrintStatement(stmt.printStatement())
-        elif stmt.whileStatement():
-            self.enterWhileStatement(stmt.whileStatement())
-        elif stmt.ifElseStatement():
-            self.enterIfElseStatement(stmt.ifElseStatement())
-        elif stmt.forLoopStatement():
-            self.enterForLoopStatement(stmt.forLoopStatement())
-        elif stmt.forStepStatement():
-            self.enterForStepStatement(stmt.forStepStatement())
-        elif stmt.whileLimitStatement():
-            self.enterWhileLimitStatement(stmt.whileStepStatement())
+        if stmt != None:
+            # You can expand this method to handle more types of statements as needed
+            if stmt.variableDeclaration():
+                self.enterVariableDeclaration(stmt.variableDeclaration())
+            elif stmt.printStatement():
+                self.enterPrintStatement(stmt.printStatement())
+            elif stmt.whileStatement():
+                self.enterWhileStatement(stmt.whileStatement())
+            elif stmt.ifElseStatement():
+                self.enterIfElseStatement(stmt.ifElseStatement())
+            elif stmt.whileStatement():
+                self.enterWhileStatement(stmt.whileStatement())
+            elif stmt.forEachStatement():
+                self.enterForEachStatement(stmt.forEachStatement())
+            elif stmt.forRangeStatement():
+                self.enterForRangeStatement(stmt.forRangeStatement())
+            elif stmt.forLoopStatement():
+                self.enterForLoopStatement(stmt.forLoopStatement())
+            elif stmt.forStepStatement():
+                self.enterForStepStatement(stmt.forStepStatement())
+            elif stmt.whileLimitStatement():
+                self.enterWhileLimitStatement(stmt.whileStepStatement())
+        else:
+            print("Statement is null in process_statement(self, stmt)")
+        
+        
 
     # Evaluating an expression (simplified)
     def evaluate_expression(self, expr_ctx):
@@ -81,13 +118,12 @@ class Evaluator(MyLangListener):
                 print(f"Warning: Variable {var_name} not defined.")
                 return 0
         elif expr_ctx.STRING():
-            return expr_ctx.STRING().getText()[1:-1]  # Remove quotes
+            raw_string = expr_ctx.STRING().getText()  # Get the raw text, including quotes
+            return raw_string[1:-1]  # Remove the first and last characters (quotes)
         elif expr_ctx.BOOLEAN():
             return expr_ctx.BOOLEAN().getText() == 'true'
         elif expr_ctx.array():
             return [self.evaluate_expression(e) for e in expr_ctx.array().expression()]
-        elif expr_ctx.object():
-            return {pair.STRING().getText()[1:-1]: self.evaluate_expression(pair.expression()) for pair in expr_ctx.object().pair()}
         elif expr_ctx.OPERATOR():
             left = self.evaluate_expression(expr_ctx.expression(0))
             right = self.evaluate_expression(expr_ctx.expression(1))
@@ -105,29 +141,25 @@ class Evaluator(MyLangListener):
         return 0
 
     def evaluate_condition(self, condition_ctx):
-        print (condition_ctx)
-        print(f"++++++++Evaluating condition: {condition_ctx[0].expression(0).getText()}++++++++")
-        if condition_ctx[0].COMPARISON_OP():
-            left = self.evaluate_expression(condition_ctx[0].expression(0))
-            right = self.evaluate_expression(condition_ctx[0].expression(1))
-            op = condition_ctx[0].COMPARISON_OP().getText()
-
-            if op == ">":
-                return left > right
-            elif op == "<":
-                return left < right
-            elif op == "==":
-                return left == right
-            elif op == "!=":
-                return left != right
-            elif op == ">=":
-                return left >= right
-            elif op == "<=":
-                return left <= right
-        elif condition_ctx.BOOLEAN():
-            return condition_ctx.BOOLEAN().getText() == 'true'
-        
-        return False
+        if isinstance(condition_ctx, list):
+            condition_ctx = condition_ctx[0]
+            
+        if condition_ctx.COMPARISON_OP():
+            left = self.evaluate_expression(condition_ctx.expression(0))
+            right = self.evaluate_expression(condition_ctx.expression(1))
+            op = condition_ctx.COMPARISON_OP().getText()
+            
+            operators = {
+                ">": lambda x, y: x > y,
+                "<": lambda x, y: x < y,
+                "==": lambda x, y: x == y,
+                "!=": lambda x, y: x != y,
+                ">=": lambda x, y: x >= y,
+                "<=": lambda x, y: x <= y
+            }
+            return operators[op](left, right)
+            
+        return condition_ctx.BOOLEAN().getText() == 'true'
 
           
       # Inspect the children of the condition
@@ -199,6 +231,53 @@ class Evaluator(MyLangListener):
             
         if "loop" in self.environment:
             del self.environment["loop"]
+
+    def enterForEachStatement(self, ctx):
+        loop_var = ctx.ID().getText()
+        iterable = self.evaluate_expression(ctx.iterable())
+        
+        MyGlobals.inside_block_flag = False
+
+        for item in iterable:
+            # Create a new scope for the loop variable
+            self.environment[loop_var] = item
+            
+            # Execute the loop body
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+
+        MyGlobals.inside_block_flag = True
+        
+        # Remove the loop variable after the loop ends
+        if loop_var in self.environment:
+            del self.environment[loop_var]
+        
+    # Updated enterForRangeStatement method
+    def enterForRangeStatement(self, ctx):
+        loop_var = ctx.ID().getText()
+        start = int(ctx.INT(0).getText())
+        end = int(ctx.INT(1).getText())
+
+        # Determine the step based on the range direction
+        step = 1 if start <= end else -1
+
+        MyGlobals.inside_block_flag = False
+
+        # Iterate over the range (inclusive for both ascending and descending)
+        for value in range(start, end + step, step):
+            # Set the loop variable in the environment
+            self.environment[loop_var] = value
+
+            # Process all statements in the loop body
+            for stmt in ctx.statement():
+                self.process_statement(stmt)
+
+        # Reset the block flag after exiting the loop
+        MyGlobals.inside_block_flag = True
+
+        # Remove the loop variable from the environment
+        if loop_var in self.environment:
+            del self.environment[loop_var]
 
     def evaluate_condition2(self, condition_ctx):
         #print(condition_ctx)

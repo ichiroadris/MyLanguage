@@ -1,7 +1,7 @@
 from antlr4 import *
 from MyLangLexer import MyLangLexer
 from MyLangParser import MyLangParser
-from MyEvaluator_copy import Evaluator
+from MyEvaluator import Evaluator
 
 # Input from the user
 expression = """
@@ -10,6 +10,17 @@ for (i in array) {
   print i
 }
 
+let empty_array = []
+for (i in empty_array) {
+  print i
+}
+
+let matrix = [[1,2], [3,4]]
+for (row in matrix) {
+  for (item in row) {
+    print item
+  }
+}
 """
 input_stream = InputStream(expression)
 

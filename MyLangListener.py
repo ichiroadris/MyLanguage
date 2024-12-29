@@ -1,4 +1,5 @@
-# Generated from c:/Users/izudd/Desktop/PLP/MyLang.g4 by ANTLR 4.13.1
+# Generated from MyLang.g4 by ANTLR 4.13.2
+import MyGlobals as MyGlobals
 from antlr4 import *
 if "." in __name__:
     from .MyLangParser import MyLangParser
@@ -80,6 +81,24 @@ class MyLangListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MyLangParser#forRangeStatement.
+    def enterForRangeStatement(self, ctx:MyLangParser.ForRangeStatementContext):
+        pass
+
+    # Exit a parse tree produced by MyLangParser#forRangeStatement.
+    def exitForRangeStatement(self, ctx:MyLangParser.ForRangeStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by MyLangParser#forEachStatement.
+    def enterForEachStatement(self, ctx:MyLangParser.ForEachStatementContext):
+        pass
+
+    # Exit a parse tree produced by MyLangParser#forEachStatement.
+    def exitForEachStatement(self, ctx:MyLangParser.ForEachStatementContext):
+        pass
+
+
     # Enter a parse tree produced by MyLangParser#forStepStatement.
     def enterForStepStatement(self, ctx:MyLangParser.ForStepStatementContext):
         pass
@@ -97,6 +116,15 @@ class MyLangListener(ParseTreeListener):
     def exitForLoopStatement(self, ctx:MyLangParser.ForLoopStatementContext):
         pass
 
+
+    # Enter a parse tree produced by MyLangParser#block.
+    def enterBlock(self, ctx:MyLangParser.BlockContext):
+        MyGlobals.inside_block_flag = True
+
+    # Exit a parse tree produced by MyLangParser#block.
+    def exitBlock(self, ctx:MyLangParser.BlockContext):
+        MyGlobals.inside_block_flag = False
+        pass
 
     # Enter a parse tree produced by MyLangParser#comment.
     def enterComment(self, ctx:MyLangParser.CommentContext):

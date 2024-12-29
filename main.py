@@ -1,30 +1,26 @@
 from antlr4 import *
 from MyLangLexer import MyLangLexer
 from MyLangParser import MyLangParser
-from MyEvaluator_copy import Evaluator
+from MyEvaluator import Evaluator
 
 # Input from the user
 expression = """
-let ab = 5
-let bc = 10
+let c = 0
 
-if(1 > 5) {
-  print ab
+if(false) {
+  print 100
+} else if(true) {
+  print 99
+} else {
+  print "I am dumb : : )"
 }
 
-for(5) {
-  print ab
+while(c < 5) {
+  let c = (c+1)
+  print "I am while loop"
 }
-
-for (1 to 8 step 2) {
-  print loop
-}
-
-while (true limit 3) {
-    print 3
-}
-
 """
+
 input_stream = InputStream(expression)
 
 # Lexical and syntactical analysis
