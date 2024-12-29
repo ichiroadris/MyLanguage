@@ -1,6 +1,6 @@
 # Generated from c:/Users/izudd/Desktop/MyLanguage- (2)/MyLang.g4 by ANTLR 4.13.1
-import MyGlobals
 from antlr4 import *
+import MyGlobals
 if "." in __name__:
     from .MyLangParser import MyLangParser
 else:
@@ -49,12 +49,9 @@ class MyLangListener(ParseTreeListener):
     def enterWhileLimitStatement(self, ctx:MyLangParser.WhileLimitStatementContext):
         pass
 
-    # Exit a parse tree produced by MyLangParser#whileStatement.
-    def exitWhileStatement(self, ctx:MyLangParser.WhileStatementContext):
-        # Reset flags when completely exiting the while statement
-        MyGlobals.tree_walking_back = False
+    # Exit a parse tree produced by MyLangParser#whileLimitStatement.
+    def exitWhileLimitStatement(self, ctx:MyLangParser.WhileLimitStatementContext):
         pass
-
 
 
     # Enter a parse tree produced by MyLangParser#whileStatement.
@@ -63,7 +60,10 @@ class MyLangListener(ParseTreeListener):
 
     # Exit a parse tree produced by MyLangParser#whileStatement.
     def exitWhileStatement(self, ctx:MyLangParser.WhileStatementContext):
+        # Reset flags when completely exiting the while statement
+        MyGlobals.tree_walking_back = False
         pass
+
 
 
     # Enter a parse tree produced by MyLangParser#ifElseStatement.
@@ -120,7 +120,7 @@ class MyLangListener(ParseTreeListener):
         pass
 
 
-     # Enter a parse tree produced by MyLangParser#block.
+    # Enter a parse tree produced by MyLangParser#block.
     def enterBlock(self, ctx:MyLangParser.BlockContext):
         MyGlobals.inside_block_flag = True
 

@@ -57,6 +57,7 @@ expression          : INT
                     | object
                     | '(' expression OPERATOR expression ')'
                     | expression '?' expression ':' expression ;
+
 LIMIT   : 'limit';
 WHILE   : 'while';
 FOR     : 'for';
@@ -86,7 +87,6 @@ COMPARISON_OP  : '>'
 BOOLEAN             : 'true' | 'false' ;
 INT       : DIGIT+ ;
 STRING : '"' ( ~["\r\n\\] | '\\' . )* '"' ;
-MINUS: '-';
 
 fragment LETTER    : 'a' .. 'z' | 'A' .. 'Z' | '_';  
 fragment DIGIT     : '0' .. '9'; 

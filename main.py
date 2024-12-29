@@ -5,13 +5,16 @@ from MyEvaluator import Evaluator
 
 # Input from the user
 expression = """
-for (1 to 10 step 2) {
-        print loop
+let i = 0
+    while (i < 2) {
+        let j = 0
+        while (j < 2) {
+            print j
+            let j = (j + 1)
+        }
+        let i = (i + 1)
     }
 
-for (10 to 1 step 2) {
-        print loop
-    }
 """
 
 input_stream = InputStream(expression)

@@ -217,7 +217,6 @@ class Evaluator(MyLangListener):
                 for stmt in block.statement():
                     self.process_statement(stmt)
                 
-     # Entering a forStepStatement
     def enterForStepStatement(self, ctx):
 
         # Parse the start, goal, and step values from the context
@@ -249,7 +248,7 @@ class Evaluator(MyLangListener):
             
         if "loop" in self.environment:
             del self.environment["loop"]
-
+            
     def enterForEachStatement(self, ctx):
         loop_var = ctx.ID().getText()
         iterable = self.evaluate_expression(ctx.iterable())
