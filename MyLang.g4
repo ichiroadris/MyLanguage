@@ -2,28 +2,29 @@ grammar MyLang;
 
 
 program      : statement+ ;
-statement    : variableDeclaration 
+statement    : variableDeclaration
               | printStatement
               | whileLimitStatement
               | whileStatement
               | ifElseStatement
               | forEachStatement
-              | forRangeStatement              
+              | forRangeStatement
               | forStepStatement
               | forLoopStatement
+              | switchStatement
               | PASS;
 variableDeclaration : LET ID '=' expression;
 printStatement      : PRINT expression;
 whileLimitStatement : WHILE '(' condition LIMIT INT')' '{' statement+ '}';
 whileStatement : WHILE '(' condition ')' '{' (statement)* '}' ;
-ifElseStatement 
+ifElseStatement
     : IF '(' condition ')' block
       ( ELIF '(' condition ')' block )*
       ( ELSE block )? ;
-switchStatement 
-    : SWITCH '(' expression ')' '{' 
-        ( CASE LITERAL (statement)+ )* 
-        ( DEFAULT (statement)+ )? 
+switchStatement
+    : SWITCH '(' expression ')' '{'
+        ( CASE expression (statement)+ )*
+        ( DEFAULT (statement)+ )?
       '}' END_SWITCH;
 forRangeStatement
     : 'for' '(' ID 'from' INT 'to' INT ')' '{' statement* '}' ;
@@ -73,24 +74,24 @@ DEFAULT : 'default' ;
 END_SWITCH : 'end switch' ;
 PASS       : 'pass' ;
 
-OPERATOR            : '+' 
-                    | '-' 
-                    | '*' 
-                    | '/' 
+OPERATOR            : '+'
+                    | '-'
+                    | '*'
+                    | '/'
                     | '%' ;
-COMPARISON_OP  : '>' 
-                    | '<' 
-                    | '==' 
-                    | '!=' 
-                    | '>=' 
+COMPARISON_OP  : '>'
+                    | '<'
+                    | '=='
+                    | '!='
+                    | '>='
                     | '<=' ;
 BOOLEAN             : 'true' | 'false' ;
 INT       : DIGIT+ ;
 STRING : '"' ( ~["\r\n\\] | '\\' . )* '"' ;
 
-fragment LETTER    : 'a' .. 'z' | 'A' .. 'Z' | '_';  
-fragment DIGIT     : '0' .. '9'; 
-ID        : LETTER (LETTER | DIGIT)* ;  
+fragment LETTER    : 'a' .. 'z' | 'A' .. 'Z' | '_';
+fragment DIGIT     : '0' .. '9';
+ID        : LETTER (LETTER | DIGIT)* ;
 LITERAL : INT
         | STRING
         | BOOLEAN ;

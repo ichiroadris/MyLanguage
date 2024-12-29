@@ -22,31 +22,31 @@ class Evaluator(MyLangListener):
         if (not MyGlobals.inside_block_flag):
             value = self.evaluate_expression(ctx.expression())
             print(value)
-        
+
 
     # Entering a whileStatement
     def enterWhileStatement(self, ctx):
         # Initialize a loop counter to track iterations
         loop_count = 0
         max_iterations = 100  # Safety limit to prevent infinite loops
-        
+
         while (self.evaluate_condition(ctx.condition()) and loop_count < max_iterations):
             # print(f"Loop iteration: {loop_count}")
-            
+
             # Store the loop count in environment for access within the loop
             self.environment['_loop_count'] = loop_count
-            
+
             # Execute all statements in the while block
             for stmt in ctx.statement():
                 self.process_statement(stmt)
-                
+
             loop_count += 1
-            
+
             # Safety check
             if loop_count >= max_iterations:
                 print("Warning: Maximum iteration limit reached")
                 break
-                
+
         # Clean up the loop counter from environment
         if '_loop_count' in self.environment:
             del self.environment['_loop_count']
@@ -101,10 +101,14 @@ class Evaluator(MyLangListener):
                 self.enterForStepStatement(stmt.forStepStatement())
             elif stmt.whileLimitStatement():
                 self.enterWhileLimitStatement(stmt.whileStepStatement())
+            elif stmt.PASS():
+                self.enterPass(stmt)
+            elif stmt.switchStatement():
+                self.enterSwitchStatement(stmt.switchStatement())
         else:
             print("Statement is null in process_statement(self, stmt)")
-        
-        
+
+
 
     # Evaluating an expression (simplified)
     def evaluate_expression(self, expr_ctx):
@@ -143,12 +147,12 @@ class Evaluator(MyLangListener):
     def evaluate_condition(self, condition_ctx):
         if isinstance(condition_ctx, list):
             condition_ctx = condition_ctx[0]
-            
+
         if condition_ctx.COMPARISON_OP():
             left = self.evaluate_expression(condition_ctx.expression(0))
             right = self.evaluate_expression(condition_ctx.expression(1))
             op = condition_ctx.COMPARISON_OP().getText()
-            
+
             operators = {
                 ">": lambda x, y: x > y,
                 "<": lambda x, y: x < y,
@@ -158,39 +162,84 @@ class Evaluator(MyLangListener):
                 "<=": lambda x, y: x <= y
             }
             return operators[op](left, right)
-            
+
         return condition_ctx.BOOLEAN().getText() == 'true'
 
-          
+
       # Inspect the children of the condition
     #   print(f"Children of the condition: {condition_ctx.children}")
 
-      
+
     # Continue with the evaluation...
 
 
     # Handle switch statement
     def enterSwitchStatement(self, ctx):
-        switch_expr = self.evaluate_expression(ctx.expression())
-        print(f"Evaluating switch expression: {switch_expr}")
-        for case in ctx.CASE():
-            case_value = self.evaluate_expression(case.LITERAL())
-            print(f"Evaluating case: {case_value}")
-            if switch_expr == case_value:
-                for stmt in case.statement():
-                    self.process_statement(stmt)
-        if ctx.DEFAULT():
-            print("Executing default case.")
-            for stmt in ctx.DEFAULT().statement():
-                self.process_statement(stmt)
-                
+        try:
+            # Evaluate the switch expression
+            switch_expr = self.evaluate_expression(ctx.expression(0))
+
+            # Get all statements for each case
+            statements = []
+            current_case_statements = []
+            expression_index = 1  # Start from 1 as 0 is the switch expression
+
+            # Collect all statements for each case
+            for i in range(len(ctx.CASE())):
+                case_value = self.evaluate_expression(ctx.expression(expression_index))
+                expression_index += 1
+
+                # Get statements for this case
+                case_statements = []
+                case_node = ctx.CASE(i)
+                parent = case_node.parentCtx
+                found_case = False
+
+                for child in parent.children:
+                    if child == case_node:
+                        found_case = True
+                        continue
+                    if found_case:
+                        if hasattr(child, 'CASE') or hasattr(child, 'DEFAULT'):
+                            break
+                        if hasattr(child, 'statement'):
+                            case_statements.append(child)
+
+                statements.append((case_value, case_statements))
+
+            # Process cases
+            case_matched = False
+            for case_value, case_statements in statements:
+                if switch_expr == case_value:
+                    case_matched = True
+                    # Execute statements for this case
+                    for stmt in case_statements:
+                        self.process_statement(stmt)
+                    break  # Exit after first match
+
+            # If no case matched and there's a default case
+            if not case_matched and ctx.DEFAULT():
+                default_node = ctx.DEFAULT()
+                parent = default_node.parentCtx
+                found_default = False
+
+                for child in parent.children:
+                    if child == default_node:
+                        found_default = True
+                        continue
+                    if found_default and hasattr(child, 'statement'):
+                        self.process_statement(child)
+
+        except Exception as e:
+            print(f"Error in switch statement: {str(e)}")
+
     # Entering a forLoopStatement
     def enterForLoopStatement(self, ctx):
         print("Entering a for loop...")
-        
+
         loop_count = ctx.INT()
         loop_count_INT = int(loop_count.getText()) - 1
-        
+
         if not isinstance(loop_count_INT, int):
             print("Warning: parameter is not an integer.")
             return
@@ -198,7 +247,7 @@ class Evaluator(MyLangListener):
         for i in range(loop_count_INT):
             for stmt in ctx.statement():
                 self.process_statement(stmt)
-                
+
      # Entering a forStepStatement
     def enterForStepStatement(self, ctx):
         print("Entering a for-step loop...")
@@ -219,39 +268,39 @@ class Evaluator(MyLangListener):
 
         # Execute the loop
         current = start
-        
+
         while current <= goal:
             self.environment["loop"] = current
             # Execute the statements inside the loop
             for stmt in ctx.statement():
                 self.process_statement(stmt)
-            
+
             # Increment the current value by the step
             current += step
-            
+
         if "loop" in self.environment:
             del self.environment["loop"]
 
     def enterForEachStatement(self, ctx):
         loop_var = ctx.ID().getText()
         iterable = self.evaluate_expression(ctx.iterable())
-        
+
         MyGlobals.inside_block_flag = False
 
         for item in iterable:
             # Create a new scope for the loop variable
             self.environment[loop_var] = item
-            
+
             # Execute the loop body
             for stmt in ctx.statement():
                 self.process_statement(stmt)
 
         MyGlobals.inside_block_flag = True
-        
+
         # Remove the loop variable after the loop ends
         if loop_var in self.environment:
             del self.environment[loop_var]
-        
+
     # Updated enterForRangeStatement method
     def enterForRangeStatement(self, ctx):
         loop_var = ctx.ID().getText()
@@ -282,16 +331,16 @@ class Evaluator(MyLangListener):
     def evaluate_condition2(self, condition_ctx):
         #print(condition_ctx)
         #print(f"++++++++Evaluating condition: {condition_ctx.getText()}++++++++")
-        
+
         # Access the children of the condition context
         children = condition_ctx.children  # Assumes `condition_ctx` has child nodes for the condition
-        
+
         if len(children) == 3:  # Typical binary condition like `1 < 2`
             lhs = int(children[0].getText())  # Left-hand side
             #print(lhs)
             op = children[1].getText()  # Operator (e.g., <, >, ==, etc.)
             rhs = int(children[2].getText())  # Right-hand side
-            
+
             # Perform the comparison
             if op == ">":
                 return lhs > rhs
@@ -307,20 +356,24 @@ class Evaluator(MyLangListener):
                 return lhs <= rhs
         elif condition_ctx.BOOLEAN():  # For boolean values
             return condition_ctx.BOOLEAN().getText() == 'true' or 'True'
-        
+
         return False  # Default return value for unsupported conditions
 
 
-    
+
 # Entering a whileLimitStatement
     def enterWhileLimitStatement(self, ctx):
         #print(ctx.condition().getText())
         limit_count = ctx.INT()
         limit = int(limit_count.getText()) - 1
-        
+
         count = 0
         # Execute the while loop as long as the condition holds true and within the limit
         while self.evaluate_condition2(ctx.condition()) and count < limit:
             for stmt in ctx.statement():
                 self.process_statement(stmt)
             count += 1  # Increment the loop count
+
+    def enterPass(self, ctx):
+        # Pass statement does nothing - it's a no-operation placeholder
+        pass
