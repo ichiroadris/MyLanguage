@@ -69,7 +69,7 @@ class Evaluator(MyLangListener):
                     else:
                         self.process_statement(ctx.block(i).statement())
                     return
-        elif ctx.ELSE():  # Else block
+        if ctx.ELSE():  # Else block
             length = len(ctx.block())  # Access the else block statements
             stmt = ctx.block(length-1).statement()
             for s in stmt:
