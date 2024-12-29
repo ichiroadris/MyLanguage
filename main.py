@@ -5,32 +5,16 @@ from MyEvaluator import Evaluator
 
 # Input from the user
 expression = """
-let c = 0
+let i = 0
+    while (i < 2) {
+        let j = 0
+        while (j < 2) {
+            print j
+            let j = (j + 1)
+        }
+        let i = (i + 1)
+    }
 
-let x = 5
-if (x > 10) {
-    print "greater than 10"
-} else if (x > 5) {
-    print "greater than 5"
-} else {
-    print "5 or less"
-}
-    
-if(false) {
-  print 100
-} else if(true) {
-  print 99
-} else {
-  print "I am dumb : : )"
-}
-
-while(c < 1) {
-  let c = (c+1)
-  print "I am while loop"
-  print c
-}
-
-print "ahmed"
 """
 
 input_stream = InputStream(expression)

@@ -181,7 +181,7 @@ def test_print_in_nested_while():
     }
     """
     output = execute_expression(expression)
-    assert output == "0\n1\n0\n1\n0\n1\n"
+    assert output == "0\n1\n0\n1\n"
 
 def test_multiple_prints():
     # Test multiple consecutive print statements

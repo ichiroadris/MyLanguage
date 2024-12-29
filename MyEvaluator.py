@@ -41,8 +41,10 @@ class Evaluator(MyLangListener):
             self.environment['_loop_count'] = loop_count
             
             # Execute all statements in the while block
-            for stmt in ctx.statement():
-                self.process_statement(stmt)
+            block = ctx.block()  # Access the block
+            if block:
+                for stmt in block.statement():
+                    self.process_statement(stmt)
                 
             loop_count += 1
         
@@ -204,14 +206,19 @@ class Evaluator(MyLangListener):
         if not isinstance(loop_count_INT, int):
             print("Warning: parameter is not an integer.")
             return
+        
+        if loop_count_INT <= 0:
+            print("Error: parameter must be a positive integer.")
+            return
 
         for i in range(loop_count_INT):
-            for stmt in ctx.statement():
-                self.process_statement(stmt)
+            block = ctx.block()  # Access the block
+            if block:
+                for stmt in block.statement():
+                    self.process_statement(stmt)
                 
      # Entering a forStepStatement
     def enterForStepStatement(self, ctx):
-        print("Entering a for-step loop...")
 
         # Parse the start, goal, and step values from the context
         # Extract integers from the INT() tokens
@@ -232,12 +239,11 @@ class Evaluator(MyLangListener):
         
         while current <= goal:
             self.environment["loop"] = current
-            # Execute the statements inside the loop
-            for stmt in ctx.statement():
-                self.process_statement(stmt)
-            
-            # Increment the current value by the step
-            current += step
+            block = ctx.block()  # Access the block
+            if block:
+                for stmt in block.statement():
+                    self.process_statement(stmt) 
+            current += step  # Increment the loop count
             
         if "loop" in self.environment:
             del self.environment["loop"]
@@ -246,48 +252,41 @@ class Evaluator(MyLangListener):
         loop_var = ctx.ID().getText()
         iterable = self.evaluate_expression(ctx.iterable())
         
-        MyGlobals.inside_block_flag = False
-
         for item in iterable:
             # Create a new scope for the loop variable
             self.environment[loop_var] = item
             
             # Execute the loop body
-            for stmt in ctx.statement():
-                self.process_statement(stmt)
-
-        MyGlobals.inside_block_flag = True
-        
-        # Remove the loop variable after the loop ends
-        if loop_var in self.environment:
-            del self.environment[loop_var]
-        
-    # Updated enterForRangeStatement method
+            block = ctx.block()  # Access the block
+            if block:
+                for stmt in block.statement():
+                    self.process_statement(stmt) 
+            # Remove the loop variable after the loop ends
+            if loop_var in self.environment:
+                del self.environment[loop_var]
+                
     def enterForRangeStatement(self, ctx):
+        # Extract the loop variable name
         loop_var = ctx.ID().getText()
+
+        # Evaluate the start and end values (from and to)
         start = int(ctx.INT(0).getText())
         end = int(ctx.INT(1).getText())
 
-        # Determine the step based on the range direction
-        step = 1 if start <= end else -1
-
-        MyGlobals.inside_block_flag = False
-
-        # Iterate over the range (inclusive for both ascending and descending)
-        for value in range(start, end + step, step):
-            # Set the loop variable in the environment
+        # Iterate over the range
+        for value in range(start, end + 1):  # Assuming inclusive range
+            # Assign the loop variable in the environment
             self.environment[loop_var] = value
 
-            # Process all statements in the loop body
-            for stmt in ctx.statement():
-                self.process_statement(stmt)
-
-        # Reset the block flag after exiting the loop
-        MyGlobals.inside_block_flag = True
-
-        # Remove the loop variable from the environment
-        if loop_var in self.environment:
-            del self.environment[loop_var]
+            # Execute the loop body
+            # Execute the loop body
+            block = ctx.block()  # Access the block
+            if block:
+                for stmt in block.statement():
+                    self.process_statement(stmt) 
+            # Remove the loop variable after the loop ends
+            if loop_var in self.environment:
+                del self.environment[loop_var]
 
     def evaluate_condition2(self, condition_ctx):
         #print(condition_ctx)
@@ -326,11 +325,18 @@ class Evaluator(MyLangListener):
     def enterWhileLimitStatement(self, ctx):
         #print(ctx.condition().getText())
         limit_count = ctx.INT()
-        limit = int(limit_count.getText()) - 1
+        limit = int(limit_count.getText())
+        
+        # Validate step to prevent infinite loops
+        if limit <= 0:
+            print("Error: Step must be a positive integer.")
+            return
         
         count = 0
         # Execute the while loop as long as the condition holds true and within the limit
         while self.evaluate_condition2(ctx.condition()) and count < limit:
-            for stmt in ctx.statement():
-                self.process_statement(stmt)
+            block = ctx.block()  # Access the block
+            if block:
+                for stmt in block.statement():
+                    self.process_statement(stmt)
             count += 1  # Increment the loop count

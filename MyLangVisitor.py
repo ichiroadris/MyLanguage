@@ -1,4 +1,4 @@
-# Generated from c:/Users/izudd/Desktop/PLP/MyLang.g4 by ANTLR 4.13.1
+# Generated from c:/Users/izudd/Desktop/MyLanguage- (2)/MyLang.g4 by ANTLR 4.13.1
 from antlr4 import *
 if "." in __name__:
     from .MyLangParser import MyLangParser
@@ -49,6 +49,16 @@ class MyLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MyLangParser#forEachStatement.
+    def visitForEachStatement(self, ctx:MyLangParser.ForEachStatementContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MyLangParser#forRangeStatement.
+    def visitForRangeStatement(self, ctx:MyLangParser.ForRangeStatementContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MyLangParser#forStepStatement.
     def visitForStepStatement(self, ctx:MyLangParser.ForStepStatementContext):
         return self.visitChildren(ctx)
@@ -56,6 +66,11 @@ class MyLangVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by MyLangParser#forLoopStatement.
     def visitForLoopStatement(self, ctx:MyLangParser.ForLoopStatementContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MyLangParser#block.
+    def visitBlock(self, ctx:MyLangParser.BlockContext):
         return self.visitChildren(ctx)
 
 

@@ -14,8 +14,8 @@ statement    : variableDeclaration
               | PASS;
 variableDeclaration : LET ID '=' expression;
 printStatement      : PRINT expression;
-whileLimitStatement : WHILE '(' condition LIMIT INT')' '{' statement+ '}';
-whileStatement : WHILE '(' condition ')' '{' (statement)* '}' ;
+whileLimitStatement : WHILE '(' condition LIMIT INT')' block;
+whileStatement : WHILE '(' condition ')' block ;
 ifElseStatement 
     : IF '(' condition ')' block
       ( ELIF '(' condition ')' block )*
@@ -25,14 +25,14 @@ switchStatement
         ( CASE LITERAL (statement)+ )* 
         ( DEFAULT (statement)+ )? 
       '}' END_SWITCH;
-forRangeStatement
-    : 'for' '(' ID 'from' INT 'to' INT ')' '{' statement* '}' ;
 forEachStatement
-    : 'for' '(' ID 'in' iterable ')' '{' statement* '}';
+    : 'for' '(' ID 'in' iterable ')' block;
+forRangeStatement
+    : 'for' '(' ID 'from' INT 'to' INT ')' block;
 forStepStatement
-    : FOR '(' start=INT 'to' goal=INT 'step' step=INT ')' block; ///Continue Later
+    : FOR '(' start=INT 'to' goal=INT 'step' step=INT ')' block;
 forLoopStatement
-    : FOR '(' INT ')' '{' (statement)* '}';
+    : FOR '(' INT ')' block;
 block : '{' (statement)* '}';
 
 
@@ -43,8 +43,7 @@ iterable            : array
                     | object
                     | INT
                     | ID ;
-array               : '[' (expression (',' expression)*)? ']'
-                    | '[' ']' ;
+array               : '[' expression (',' expression)* ']' ;
 object : '{' (pair (',' pair)*)? '}' ;
 pair  : STRING ':' expression ;
 condition           : expression COMPARISON_OP expression
