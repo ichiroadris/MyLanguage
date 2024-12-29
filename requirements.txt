@@ -1,2 +1,2 @@
-pip install pytest
-pip install antlr4-python3-runtime
+pytest
+antlr4-python3-runtime
